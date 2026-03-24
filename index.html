@@ -818,9 +818,13 @@ body {
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
       Uretim Panosu
     </div>
+    <div class="nav-item" data-screen="workorders">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/></svg>
+      Is Emirleri
+    </div>
     <div class="nav-item" data-screen="workorder">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-      Is Emirleri
+      Is Emri Detayi
     </div>
     <div class="nav-item" data-screen="capacity">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="21" x2="9" y2="9"/><line x1="15" y1="21" x2="15" y2="14"/></svg>
@@ -1262,6 +1266,345 @@ body {
                 <div style="display:flex;align-items:center;gap:8px">
                   <div style="flex:1;height:6px;background:var(--bg-dark);border-radius:3px;overflow:hidden"><div style="width:100%;height:100%;background:var(--accent-green);border-radius:3px"></div></div>
                   <span style="font-size:11px;color:var(--text-muted);width:30px">100%</span>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ===== IS EMRI YONETIMI ===== -->
+    <div class="screen" id="screen-workorders">
+      <!-- KPI -->
+      <div class="kpi-row" style="grid-template-columns:repeat(5,1fr)">
+        <div class="kpi-card">
+          <div class="kpi-label">Toplam Is Emri</div>
+          <div class="kpi-value">124</div>
+          <div class="kpi-sub">Aktif donem</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Bekleyen</div>
+          <div class="kpi-value" style="color:var(--accent-amber)">32</div>
+          <div class="kpi-sub">Planlanmadi</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Devam Eden</div>
+          <div class="kpi-value" style="color:var(--accent-blue)">45</div>
+          <div class="kpi-sub">Uretimde</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Geciken</div>
+          <div class="kpi-value" style="color:var(--accent-red)">11</div>
+          <div class="kpi-sub">Termin asimi</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Tamamlanan</div>
+          <div class="kpi-value" style="color:var(--accent-green)">36</div>
+          <div class="kpi-sub">Bu ay</div>
+        </div>
+      </div>
+
+      <!-- Filtre ve Aksiyonlar -->
+      <div class="panel">
+        <div class="panel-header">
+          <div style="display:flex;align-items:center;gap:8px">
+            <h3>Is Emri Listesi</h3>
+            <div style="display:flex;gap:4px;margin-left:12px">
+              <button class="plan-filter-btn active" onclick="filterWO(this,'all')">Tumu <span class="filter-count">124</span></button>
+              <button class="plan-filter-btn" onclick="filterWO(this,'bekleyen')">Bekleyen <span class="filter-count">32</span></button>
+              <button class="plan-filter-btn" onclick="filterWO(this,'devam')">Devam Eden <span class="filter-count">45</span></button>
+              <button class="plan-filter-btn" onclick="filterWO(this,'geciken')">Geciken <span class="filter-count">11</span></button>
+              <button class="plan-filter-btn" onclick="filterWO(this,'tamamlandi')">Tamamlandi <span class="filter-count">36</span></button>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <input type="text" placeholder="Is emri, parca veya musteri ara..." oninput="searchWO(this.value)" style="background:var(--bg-input);border:1px solid var(--border);color:var(--text-primary);padding:6px 12px;border-radius:var(--radius-sm);font-size:12px;outline:none;width:220px">
+            <button class="btn btn-ghost" style="font-size:11px">Toplu Guncelle</button>
+            <button class="btn btn-primary" style="font-size:11px">+ Yeni Is Emri</button>
+          </div>
+        </div>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th><input type="checkbox" id="wo-check-all" onchange="toggleAllWO(this)"></th>
+              <th>Is Emri No</th>
+              <th>Siparis No</th>
+              <th>Musteri</th>
+              <th>Parca Adi</th>
+              <th>Miktar</th>
+              <th>Makine</th>
+              <th>Plan Baslangic</th>
+              <th>Termin</th>
+              <th>Oncelik</th>
+              <th>Durum</th>
+              <th>Ilerleme</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="wo-row" data-status="geciken">
+              <td><input type="checkbox" class="wo-check"></td>
+              <td style="color:var(--text-primary);font-weight:600">WO-1087</td>
+              <td style="color:var(--text-muted)">SIP-0412</td>
+              <td>Ford Otosan</td>
+              <td>Fren Kaliper Govdesi</td>
+              <td>500</td>
+              <td><span style="color:var(--accent-blue)">CNC-03</span></td>
+              <td>18 Mar, 06:00</td>
+              <td style="color:var(--accent-red)">20 Mar</td>
+              <td><span class="badge badge-red">Kritik</span></td>
+              <td><span class="badge badge-red">Gecikti</span></td>
+              <td>
+                <div style="display:flex;align-items:center;gap:8px">
+                  <div style="flex:1;height:6px;background:var(--bg-dark);border-radius:3px;overflow:hidden"><div style="width:45%;height:100%;background:var(--accent-red);border-radius:3px"></div></div>
+                  <span style="font-size:11px;color:var(--text-muted);width:30px">45%</span>
+                </div>
+              </td>
+            </tr>
+            <tr class="wo-row" data-status="devam">
+              <td><input type="checkbox" class="wo-check"></td>
+              <td style="color:var(--text-primary);font-weight:600">WO-1105</td>
+              <td style="color:var(--text-muted)">SIP-0415</td>
+              <td>Ford Otosan</td>
+              <td>Fren Kaliper Govdesi</td>
+              <td>500</td>
+              <td><span style="color:var(--accent-blue)">CNC-03</span></td>
+              <td>22 Mar, 06:00</td>
+              <td>26 Mar</td>
+              <td><span class="badge badge-red">Kritik</span></td>
+              <td><span class="badge badge-blue">Devam Ediyor</span></td>
+              <td>
+                <div style="display:flex;align-items:center;gap:8px">
+                  <div style="flex:1;height:6px;background:var(--bg-dark);border-radius:3px;overflow:hidden"><div style="width:62%;height:100%;background:var(--accent-blue);border-radius:3px"></div></div>
+                  <span style="font-size:11px;color:var(--text-muted);width:30px">62%</span>
+                </div>
+              </td>
+            </tr>
+            <tr class="wo-row" data-status="geciken">
+              <td><input type="checkbox" class="wo-check"></td>
+              <td style="color:var(--text-primary);font-weight:600">WO-1092</td>
+              <td style="color:var(--text-muted)">SIP-0389</td>
+              <td>Toyota Turkiye</td>
+              <td>Sanziman Mili</td>
+              <td>1.200</td>
+              <td><span style="color:var(--accent-blue)">CNC-07</span></td>
+              <td>15 Mar, 06:00</td>
+              <td style="color:var(--accent-red)">21 Mar</td>
+              <td><span class="badge badge-amber">Yuksek</span></td>
+              <td><span class="badge badge-red">Gecikti</span></td>
+              <td>
+                <div style="display:flex;align-items:center;gap:8px">
+                  <div style="flex:1;height:6px;background:var(--bg-dark);border-radius:3px;overflow:hidden"><div style="width:82%;height:100%;background:var(--accent-red);border-radius:3px"></div></div>
+                  <span style="font-size:11px;color:var(--text-muted);width:30px">82%</span>
+                </div>
+              </td>
+            </tr>
+            <tr class="wo-row" data-status="devam">
+              <td><input type="checkbox" class="wo-check"></td>
+              <td style="color:var(--text-primary);font-weight:600">WO-1101</td>
+              <td style="color:var(--text-muted)">SIP-0401</td>
+              <td>TOFAS</td>
+              <td>Piston Kolu</td>
+              <td>2.000</td>
+              <td><span style="color:var(--accent-blue)">CNC-01</span></td>
+              <td>20 Mar, 14:00</td>
+              <td>28 Mar</td>
+              <td><span class="badge badge-gray">Normal</span></td>
+              <td><span class="badge badge-blue">Devam Ediyor</span></td>
+              <td>
+                <div style="display:flex;align-items:center;gap:8px">
+                  <div style="flex:1;height:6px;background:var(--bg-dark);border-radius:3px;overflow:hidden"><div style="width:71%;height:100%;background:var(--accent-blue);border-radius:3px"></div></div>
+                  <span style="font-size:11px;color:var(--text-muted);width:30px">71%</span>
+                </div>
+              </td>
+            </tr>
+            <tr class="wo-row" data-status="devam">
+              <td><input type="checkbox" class="wo-check"></td>
+              <td style="color:var(--text-primary);font-weight:600">WO-1103</td>
+              <td style="color:var(--text-muted)">SIP-0398</td>
+              <td>Hyundai Assan</td>
+              <td>Vites Kutusu Kapagi</td>
+              <td>300</td>
+              <td><span style="color:var(--accent-blue)">CNC-05</span></td>
+              <td>21 Mar, 06:00</td>
+              <td>27 Mar</td>
+              <td><span class="badge badge-gray">Normal</span></td>
+              <td><span class="badge badge-blue">Devam Ediyor</span></td>
+              <td>
+                <div style="display:flex;align-items:center;gap:8px">
+                  <div style="flex:1;height:6px;background:var(--bg-dark);border-radius:3px;overflow:hidden"><div style="width:55%;height:100%;background:var(--accent-blue);border-radius:3px"></div></div>
+                  <span style="font-size:11px;color:var(--text-muted);width:30px">55%</span>
+                </div>
+              </td>
+            </tr>
+            <tr class="wo-row" data-status="tamamlandi">
+              <td><input type="checkbox" class="wo-check"></td>
+              <td style="color:var(--text-primary);font-weight:600">WO-1102</td>
+              <td style="color:var(--text-muted)">SIP-0375</td>
+              <td>Mercedes Turk</td>
+              <td>Silindir Basligi</td>
+              <td>750</td>
+              <td><span style="color:var(--text-muted)">CNC-02</span></td>
+              <td>17 Mar, 06:00</td>
+              <td>24 Mar</td>
+              <td><span class="badge badge-amber">Yuksek</span></td>
+              <td><span class="badge badge-green">Tamamlandi</span></td>
+              <td>
+                <div style="display:flex;align-items:center;gap:8px">
+                  <div style="flex:1;height:6px;background:var(--bg-dark);border-radius:3px;overflow:hidden"><div style="width:100%;height:100%;background:var(--accent-green);border-radius:3px"></div></div>
+                  <span style="font-size:11px;color:var(--text-muted);width:30px">100%</span>
+                </div>
+              </td>
+            </tr>
+            <tr class="wo-row" data-status="bekleyen">
+              <td><input type="checkbox" class="wo-check"></td>
+              <td style="color:var(--text-primary);font-weight:600">WO-1130</td>
+              <td style="color:var(--text-muted)">SIP-0420</td>
+              <td>Karsan</td>
+              <td>Arka Aks Mili</td>
+              <td>400</td>
+              <td><span style="color:var(--text-muted)">-</span></td>
+              <td style="color:var(--text-muted)">Planlanmadi</td>
+              <td>29 Mar</td>
+              <td><span class="badge badge-gray">Normal</span></td>
+              <td><span class="badge badge-amber">Bekliyor</span></td>
+              <td>
+                <div style="display:flex;align-items:center;gap:8px">
+                  <div style="flex:1;height:6px;background:var(--bg-dark);border-radius:3px;overflow:hidden"><div style="width:0%;height:100%;background:var(--accent-blue);border-radius:3px"></div></div>
+                  <span style="font-size:11px;color:var(--text-muted);width:30px">0%</span>
+                </div>
+              </td>
+            </tr>
+            <tr class="wo-row" data-status="bekleyen">
+              <td><input type="checkbox" class="wo-check"></td>
+              <td style="color:var(--text-primary);font-weight:600">WO-1131</td>
+              <td style="color:var(--text-muted)">SIP-0422</td>
+              <td>Karsan</td>
+              <td>Kaplin Kapagi</td>
+              <td>250</td>
+              <td><span style="color:var(--text-muted)">-</span></td>
+              <td style="color:var(--text-muted)">Planlanmadi</td>
+              <td>29 Mar</td>
+              <td><span class="badge badge-gray">Normal</span></td>
+              <td><span class="badge badge-amber">Bekliyor</span></td>
+              <td>
+                <div style="display:flex;align-items:center;gap:8px">
+                  <div style="flex:1;height:6px;background:var(--bg-dark);border-radius:3px;overflow:hidden"><div style="width:0%;height:100%;background:var(--accent-blue);border-radius:3px"></div></div>
+                  <span style="font-size:11px;color:var(--text-muted);width:30px">0%</span>
+                </div>
+              </td>
+            </tr>
+            <tr class="wo-row" data-status="geciken">
+              <td><input type="checkbox" class="wo-check"></td>
+              <td style="color:var(--text-primary);font-weight:600">WO-1078</td>
+              <td style="color:var(--text-muted)">SIP-0380</td>
+              <td>Hyundai Assan</td>
+              <td>Vites Kutusu Kapagi</td>
+              <td>300</td>
+              <td><span style="color:var(--accent-blue)">CNC-05</span></td>
+              <td>12 Mar, 06:00</td>
+              <td style="color:var(--accent-red)">19 Mar</td>
+              <td><span class="badge badge-gray">Normal</span></td>
+              <td><span class="badge badge-amber">Bloke</span></td>
+              <td>
+                <div style="display:flex;align-items:center;gap:8px">
+                  <div style="flex:1;height:6px;background:var(--bg-dark);border-radius:3px;overflow:hidden"><div style="width:30%;height:100%;background:var(--accent-amber);border-radius:3px"></div></div>
+                  <span style="font-size:11px;color:var(--text-muted);width:30px">30%</span>
+                </div>
+              </td>
+            </tr>
+            <tr class="wo-row" data-status="bekleyen">
+              <td><input type="checkbox" class="wo-check"></td>
+              <td style="color:var(--text-primary);font-weight:600">WO-1135</td>
+              <td style="color:var(--text-muted)">SIP-0425</td>
+              <td>Mercedes Turk</td>
+              <td>Valf Govdesi</td>
+              <td>150</td>
+              <td><span style="color:var(--text-muted)">-</span></td>
+              <td style="color:var(--text-muted)">Planlanmadi</td>
+              <td>28 Mar</td>
+              <td><span class="badge badge-amber">Yuksek</span></td>
+              <td><span class="badge badge-amber">Bekliyor</span></td>
+              <td>
+                <div style="display:flex;align-items:center;gap:8px">
+                  <div style="flex:1;height:6px;background:var(--bg-dark);border-radius:3px;overflow:hidden"><div style="width:0%;height:100%;background:var(--accent-blue);border-radius:3px"></div></div>
+                  <span style="font-size:11px;color:var(--text-muted);width:30px">0%</span>
+                </div>
+              </td>
+            </tr>
+            <tr class="wo-row" data-status="devam">
+              <td><input type="checkbox" class="wo-check"></td>
+              <td style="color:var(--text-primary);font-weight:600">WO-1112</td>
+              <td style="color:var(--text-muted)">SIP-0395</td>
+              <td>Mercedes Turk</td>
+              <td>Silindir Basligi V2</td>
+              <td>750</td>
+              <td><span style="color:var(--accent-blue)">CNC-02</span></td>
+              <td>22 Mar, 14:00</td>
+              <td>27 Mar</td>
+              <td><span class="badge badge-gray">Normal</span></td>
+              <td><span class="badge badge-blue">Devam Ediyor</span></td>
+              <td>
+                <div style="display:flex;align-items:center;gap:8px">
+                  <div style="flex:1;height:6px;background:var(--bg-dark);border-radius:3px;overflow:hidden"><div style="width:35%;height:100%;background:var(--accent-blue);border-radius:3px"></div></div>
+                  <span style="font-size:11px;color:var(--text-muted);width:30px">35%</span>
+                </div>
+              </td>
+            </tr>
+            <tr class="wo-row" data-status="tamamlandi">
+              <td><input type="checkbox" class="wo-check"></td>
+              <td style="color:var(--text-primary);font-weight:600">WO-1080</td>
+              <td style="color:var(--text-muted)">SIP-0362</td>
+              <td>Toyota Turkiye</td>
+              <td>Rulman Yuvasi</td>
+              <td>500</td>
+              <td><span style="color:var(--text-muted)">CNC-04</span></td>
+              <td>10 Mar, 06:00</td>
+              <td>20 Mar</td>
+              <td><span class="badge badge-gray">Normal</span></td>
+              <td><span class="badge badge-green">Tamamlandi</span></td>
+              <td>
+                <div style="display:flex;align-items:center;gap:8px">
+                  <div style="flex:1;height:6px;background:var(--bg-dark);border-radius:3px;overflow:hidden"><div style="width:100%;height:100%;background:var(--accent-green);border-radius:3px"></div></div>
+                  <span style="font-size:11px;color:var(--text-muted);width:30px">100%</span>
+                </div>
+              </td>
+            </tr>
+            <tr class="wo-row" data-status="devam">
+              <td><input type="checkbox" class="wo-check"></td>
+              <td style="color:var(--text-primary);font-weight:600">WO-1095</td>
+              <td style="color:var(--text-muted)">SIP-0401</td>
+              <td>TOFAS</td>
+              <td>Piston Kolu - Parti 2</td>
+              <td>1.000</td>
+              <td><span style="color:var(--accent-blue)">CNC-06</span></td>
+              <td>23 Mar, 06:00</td>
+              <td>28 Mar</td>
+              <td><span class="badge badge-gray">Normal</span></td>
+              <td><span class="badge badge-blue">Devam Ediyor</span></td>
+              <td>
+                <div style="display:flex;align-items:center;gap:8px">
+                  <div style="flex:1;height:6px;background:var(--bg-dark);border-radius:3px;overflow:hidden"><div style="width:22%;height:100%;background:var(--accent-blue);border-radius:3px"></div></div>
+                  <span style="font-size:11px;color:var(--text-muted);width:30px">22%</span>
+                </div>
+              </td>
+            </tr>
+            <tr class="wo-row" data-status="bekleyen">
+              <td><input type="checkbox" class="wo-check"></td>
+              <td style="color:var(--text-primary);font-weight:600">WO-1140</td>
+              <td style="color:var(--text-muted)">SIP-0430</td>
+              <td>Renault Bursa</td>
+              <td>Supap Yatak Gövdesi</td>
+              <td>600</td>
+              <td><span style="color:var(--text-muted)">-</span></td>
+              <td style="color:var(--text-muted)">Planlanmadi</td>
+              <td>02 Nis</td>
+              <td><span class="badge badge-gray">Normal</span></td>
+              <td><span class="badge badge-amber">Bekliyor</span></td>
+              <td>
+                <div style="display:flex;align-items:center;gap:8px">
+                  <div style="flex:1;height:6px;background:var(--bg-dark);border-radius:3px;overflow:hidden"><div style="width:0%;height:100%;background:var(--accent-blue);border-radius:3px"></div></div>
+                  <span style="font-size:11px;color:var(--text-muted);width:30px">0%</span>
                 </div>
               </td>
             </tr>
@@ -2045,6 +2388,7 @@ const screenTitle = document.getElementById('screen-title');
 const titles = {
   dashboard: 'Yonetim Paneli',
   orders: 'Siparis Yonetimi',
+  workorders: 'Is Emri Yonetimi',
   planning: 'Uretim Planlama Panosu',
   workorder: 'Is Emri Detayi',
   capacity: 'Kapasite Planlama',
@@ -2212,6 +2556,28 @@ function updateNowLines() {
   });
 }
 updateNowLines();
+
+// Is Emri tablosu filtreleme
+function filterWO(btn, status) {
+  btn.parentElement.querySelectorAll('.plan-filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.wo-row').forEach(row => {
+    row.style.display = (status === 'all' || row.dataset.status === status) ? '' : 'none';
+  });
+}
+
+// Is Emri arama
+function searchWO(q) {
+  q = q.toLowerCase();
+  document.querySelectorAll('.wo-row').forEach(row => {
+    row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
+  });
+}
+
+// Is Emri toplu secim
+function toggleAllWO(master) {
+  document.querySelectorAll('.wo-check').forEach(cb => { cb.checked = master.checked; });
+}
 
 // Siparis tablosu filtreleme
 function filterOrders(btn, status) {
