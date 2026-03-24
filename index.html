@@ -255,6 +255,42 @@ body {
 .md-tab { display: none; }
 .md-tab.active { display: block; }
 
+/* ===== OPERATOR PANEL ===== */
+.op-machine-select { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+.op-machine-btn {
+  background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius);
+  padding: 16px; cursor: pointer; text-align: center; transition: border-color 0.15s, background 0.15s;
+}
+.op-machine-btn:hover { border-color: var(--accent-blue); }
+.op-machine-btn.selected { border-color: var(--accent-blue); background: rgba(74,144,217,0.1); }
+.op-machine-btn h4 { color: var(--text-primary); font-size: 16px; margin-bottom: 4px; }
+.op-machine-btn .op-m-status { font-size: 11px; }
+.op-workspace { display: grid; grid-template-columns: 1fr 340px; gap: 20px; }
+.op-actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 16px; }
+.op-action-btn {
+  padding: 20px 16px; border-radius: var(--radius); border: none; cursor: pointer;
+  font-size: 14px; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 1px;
+  transition: opacity 0.15s;
+}
+.op-action-btn:hover { opacity: 0.85; }
+.op-action-btn.start { background: var(--accent-green); }
+.op-action-btn.pause { background: var(--accent-amber); }
+.op-action-btn.stop { background: var(--accent-red); }
+.op-input-group { display: flex; flex-direction: column; gap: 6px; margin-top: 12px; }
+.op-input-group label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+.op-input-group input, .op-input-group select {
+  background: var(--bg-input); border: 1px solid var(--border); color: var(--text-primary);
+  padding: 10px 14px; border-radius: var(--radius-sm); font-size: 14px; outline: none;
+}
+.op-big-number { font-size: 48px; font-weight: 800; color: var(--text-primary); line-height: 1; }
+.op-job-list { list-style: none; }
+.op-job-list li {
+  padding: 12px 16px; border-bottom: 1px solid var(--border); display: flex;
+  justify-content: space-between; align-items: center; font-size: 12px;
+}
+.op-job-list li:last-child { border-bottom: none; }
+.op-job-list li.active-job { background: rgba(74,144,217,0.08); border-left: 3px solid var(--accent-blue); }
+
 /* ===== STATUS BADGES ===== */
 .badge {
   display: inline-block;
@@ -843,6 +879,11 @@ body {
     <div class="nav-item" data-screen="analytics">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
       Plan - Gerceklesen
+    </div>
+
+    <div class="nav-item" data-screen="operator">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      Operator Paneli
     </div>
 
     <div class="nav-section-label">Tanimlar</div>
@@ -2228,6 +2269,257 @@ body {
       </div>
     </div>
 
+    <!-- ===== OPERATOR PANELI ===== -->
+    <div class="screen" id="screen-operator">
+      <!-- Makine Secimi -->
+      <div class="op-machine-select">
+        <div class="op-machine-btn selected" onclick="selectOpMachine(this,'CNC-01')">
+          <h4>CNC-01</h4>
+          <div class="op-m-status" style="color:var(--accent-green)">Calisiyor</div>
+        </div>
+        <div class="op-machine-btn" onclick="selectOpMachine(this,'CNC-02')">
+          <h4>CNC-02</h4>
+          <div class="op-m-status" style="color:var(--accent-green)">Calisiyor</div>
+        </div>
+        <div class="op-machine-btn" onclick="selectOpMachine(this,'CNC-03')">
+          <h4>CNC-03</h4>
+          <div class="op-m-status" style="color:var(--accent-green)">Calisiyor</div>
+        </div>
+        <div class="op-machine-btn" onclick="selectOpMachine(this,'CNC-04')">
+          <h4>CNC-04</h4>
+          <div class="op-m-status" style="color:var(--accent-amber)">Bosta</div>
+        </div>
+        <div class="op-machine-btn" onclick="selectOpMachine(this,'CNC-05')">
+          <h4>CNC-05</h4>
+          <div class="op-m-status" style="color:var(--accent-green)">Calisiyor</div>
+        </div>
+        <div class="op-machine-btn" onclick="selectOpMachine(this,'CNC-06')">
+          <h4>CNC-06</h4>
+          <div class="op-m-status" style="color:var(--accent-green)">Calisiyor</div>
+        </div>
+        <div class="op-machine-btn" onclick="selectOpMachine(this,'CNC-07')">
+          <h4>CNC-07</h4>
+          <div class="op-m-status" style="color:var(--accent-red)">Bloke</div>
+        </div>
+        <div class="op-machine-btn" onclick="selectOpMachine(this,'CNC-08')">
+          <h4>CNC-08</h4>
+          <div class="op-m-status" style="color:var(--accent-red)">Bakimda</div>
+        </div>
+      </div>
+
+      <!-- Calisma Alani -->
+      <div class="op-workspace">
+        <!-- Sol: Aktif is ve aksiyonlar -->
+        <div>
+          <div class="panel">
+            <div class="panel-header">
+              <h3>Aktif Is - CNC-01</h3>
+              <span class="badge badge-green">Calisiyor</span>
+            </div>
+            <div style="padding:20px">
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+                <div>
+                  <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px">Is Emri</div>
+                  <div style="font-size:18px;font-weight:700;color:var(--text-primary)">WO-1103</div>
+                </div>
+                <div>
+                  <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px">Parca</div>
+                  <div style="font-size:18px;font-weight:700;color:var(--text-primary)">GBX-1155</div>
+                </div>
+                <div>
+                  <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px">Musteri</div>
+                  <div style="font-size:14px;color:var(--text-secondary)">Hyundai Assan</div>
+                </div>
+                <div>
+                  <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px">Operasyon</div>
+                  <div style="font-size:14px;color:var(--text-secondary)">Op 20 - Hassas Frezeleme</div>
+                </div>
+              </div>
+
+              <!-- Uretim Sayaci -->
+              <div style="margin-top:24px;display:flex;align-items:flex-end;gap:24px">
+                <div>
+                  <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">Uretilen / Hedef</div>
+                  <div><span class="op-big-number">185</span><span style="font-size:24px;color:var(--text-muted);font-weight:300"> / 300</span></div>
+                </div>
+                <div style="flex:1">
+                  <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-muted);margin-bottom:4px">
+                    <span>Ilerleme</span><span style="color:var(--text-primary);font-weight:600">%62</span>
+                  </div>
+                  <div style="height:12px;background:var(--bg-dark);border-radius:6px;overflow:hidden">
+                    <div style="width:62%;height:100%;background:var(--accent-blue);border-radius:6px"></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Cevrim Bilgisi -->
+              <div style="margin-top:20px;display:grid;grid-template-columns:repeat(4,1fr);gap:12px">
+                <div style="background:var(--bg-dark);padding:12px;border-radius:var(--radius-sm);text-align:center">
+                  <div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;margin-bottom:4px">Cevrim Suresi</div>
+                  <div style="font-size:18px;font-weight:700;color:var(--text-primary)">4,2 dk</div>
+                </div>
+                <div style="background:var(--bg-dark);padding:12px;border-radius:var(--radius-sm);text-align:center">
+                  <div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;margin-bottom:4px">Std. Cevrim</div>
+                  <div style="font-size:18px;font-weight:700;color:var(--accent-green)">4,0 dk</div>
+                </div>
+                <div style="background:var(--bg-dark);padding:12px;border-radius:var(--radius-sm);text-align:center">
+                  <div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;margin-bottom:4px">Verimlilik</div>
+                  <div style="font-size:18px;font-weight:700;color:var(--accent-green)">%95</div>
+                </div>
+                <div style="background:var(--bg-dark);padding:12px;border-radius:var(--radius-sm);text-align:center">
+                  <div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;margin-bottom:4px">Fire</div>
+                  <div style="font-size:18px;font-weight:700;color:var(--accent-amber)">3</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Aksiyon Butonlari -->
+          <div class="op-actions">
+            <button class="op-action-btn start" onclick="opAction('start')">Baslat</button>
+            <button class="op-action-btn pause" onclick="opAction('pause')">Durdur</button>
+            <button class="op-action-btn stop" onclick="opAction('stop')">Tamamla</button>
+          </div>
+
+          <!-- Adet ve Durus Girisi -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px">
+            <div class="panel" style="margin:0">
+              <div class="panel-header"><h3>Adet Girisi</h3></div>
+              <div style="padding:16px 20px">
+                <div class="op-input-group">
+                  <label>Uretilen Adet</label>
+                  <input type="number" value="185" min="0">
+                </div>
+                <div class="op-input-group">
+                  <label>Fire Adet</label>
+                  <input type="number" value="3" min="0">
+                </div>
+                <div class="op-input-group">
+                  <label>Fire Nedeni</label>
+                  <select>
+                    <option>Secin...</option>
+                    <option>Olcu disi</option>
+                    <option>Yuzey hatasi</option>
+                    <option>Capak</option>
+                    <option>Hammadde hatasi</option>
+                    <option>Takim asinmasi</option>
+                  </select>
+                </div>
+                <button class="btn btn-primary" style="width:100%;margin-top:12px;padding:10px">Kaydet</button>
+              </div>
+            </div>
+            <div class="panel" style="margin:0">
+              <div class="panel-header"><h3>Durus Bildirimi</h3></div>
+              <div style="padding:16px 20px">
+                <div class="op-input-group">
+                  <label>Durus Nedeni</label>
+                  <select>
+                    <option>Secin...</option>
+                    <option>Takim degisimi</option>
+                    <option>Takim kirilmasi</option>
+                    <option>Malzeme bekleme</option>
+                    <option>Kalite kontrol</option>
+                    <option>Setup / Ayar</option>
+                    <option>Ariza</option>
+                    <option>Mola</option>
+                    <option>Diger</option>
+                  </select>
+                </div>
+                <div class="op-input-group">
+                  <label>Aciklama (opsiyonel)</label>
+                  <input type="text" placeholder="Detay girin...">
+                </div>
+                <button class="btn btn-ghost" style="width:100%;margin-top:12px;padding:10px;border:1px solid var(--accent-amber);color:var(--accent-amber)">Durus Baslat</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sag: Is Kuyrugu -->
+        <div>
+          <div class="panel">
+            <div class="panel-header"><h3>Is Kuyrugu - CNC-01</h3></div>
+            <ul class="op-job-list">
+              <li class="active-job">
+                <div>
+                  <div style="font-weight:600;color:var(--text-primary)">WO-1103</div>
+                  <div style="color:var(--text-muted);margin-top:2px">GBX-1155 &middot; 300 adet</div>
+                </div>
+                <span class="badge badge-blue">Aktif</span>
+              </li>
+              <li>
+                <div>
+                  <div style="font-weight:600;color:var(--text-primary)">WO-1130</div>
+                  <div style="color:var(--text-muted);margin-top:2px">AXL-8810 &middot; 400 adet</div>
+                </div>
+                <span class="badge badge-amber">Sirada</span>
+              </li>
+              <li>
+                <div>
+                  <div style="font-weight:600;color:var(--text-primary)">WO-1140</div>
+                  <div style="color:var(--text-muted);margin-top:2px">Supap Yatak &middot; 600 adet</div>
+                </div>
+                <span class="badge badge-gray">Bekliyor</span>
+              </li>
+            </ul>
+          </div>
+
+          <div class="panel" style="margin-top:16px">
+            <div class="panel-header"><h3>Bugunun Ozeti</h3></div>
+            <div style="padding:16px 20px">
+              <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:12px">
+                <span style="color:var(--text-muted)">Toplam Uretilen</span>
+                <span style="color:var(--text-primary);font-weight:600">185 adet</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:12px">
+                <span style="color:var(--text-muted)">Fire</span>
+                <span style="color:var(--accent-amber);font-weight:600">3 adet</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:12px">
+                <span style="color:var(--text-muted)">Calisma Suresi</span>
+                <span style="color:var(--text-primary);font-weight:600">6s 45dk</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:12px">
+                <span style="color:var(--text-muted)">Durus Suresi</span>
+                <span style="color:var(--accent-red);font-weight:600">1s 15dk</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;padding:8px 0;font-size:12px">
+                <span style="color:var(--text-muted)">Verimlilik</span>
+                <span style="color:var(--accent-green);font-weight:600">%84</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel" style="margin-top:16px">
+            <div class="panel-header"><h3>Son Duruslar</h3></div>
+            <div style="padding:12px 20px;font-size:12px">
+              <div style="padding:8px 0;border-bottom:1px solid var(--border)">
+                <div style="display:flex;justify-content:space-between">
+                  <span style="color:var(--text-primary);font-weight:500">Takim degisimi</span>
+                  <span style="color:var(--text-muted)">25 dk</span>
+                </div>
+                <div style="color:var(--text-muted);margin-top:2px">10:30 - 10:55</div>
+              </div>
+              <div style="padding:8px 0;border-bottom:1px solid var(--border)">
+                <div style="display:flex;justify-content:space-between">
+                  <span style="color:var(--text-primary);font-weight:500">Mola</span>
+                  <span style="color:var(--text-muted)">30 dk</span>
+                </div>
+                <div style="color:var(--text-muted);margin-top:2px">12:00 - 12:30</div>
+              </div>
+              <div style="padding:8px 0">
+                <div style="display:flex;justify-content:space-between">
+                  <span style="color:var(--text-primary);font-weight:500">Malzeme bekleme</span>
+                  <span style="color:var(--text-muted)">20 dk</span>
+                </div>
+                <div style="color:var(--text-muted);margin-top:2px">08:15 - 08:35</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- ===== 6. PLAN - GERCEKLESEN ANALIZI ===== -->
     <div class="screen" id="screen-analytics">
       <div class="kpi-row" style="grid-template-columns:repeat(4,1fr)">
@@ -2564,6 +2856,7 @@ const titles = {
   capacity: 'Kapasite Planlama',
   shopfloor: 'Uretim Sahasi Izleme',
   analytics: 'Plan - Gerceklesen Analizi',
+  operator: 'Operator Paneli',
   masterdata: 'Ana Veri Yonetimi'
 };
 
@@ -2727,6 +3020,18 @@ function updateNowLines() {
   });
 }
 updateNowLines();
+
+// Operator panel - makine secimi
+function selectOpMachine(btn) {
+  document.querySelectorAll('.op-machine-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+}
+
+// Operator panel - aksiyon butonlari
+function opAction(action) {
+  const labels = { start: 'Uretim baslatildi', pause: 'Uretim durduruldu', stop: 'Is emri tamamlandi' };
+  alert(labels[action] + ' (demo)');
+}
 
 // Ana Veri tab gecisi
 function switchMasterTab(btn, tabId) {
