@@ -1,0 +1,1937 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wamer - Uretim Planlama & Operasyon Yonetimi</title>
+<style>
+/* ===== RESET & BASE ===== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg-dark: #1a1d23;
+  --bg-panel: #22262e;
+  --bg-card: #2a2f38;
+  --bg-hover: #323842;
+  --bg-input: #1e2128;
+  --border: #363c47;
+  --border-light: #424a57;
+  --text-primary: #e8eaed;
+  --text-secondary: #9aa0ab;
+  --text-muted: #6b7280;
+  --accent-blue: #4a90d9;
+  --accent-blue-dim: #3a7ac4;
+  --accent-green: #4caf7a;
+  --accent-green-dim: rgba(76,175,122,0.15);
+  --accent-amber: #e8a838;
+  --accent-amber-dim: rgba(232,168,56,0.15);
+  --accent-red: #e05555;
+  --accent-red-dim: rgba(224,85,85,0.15);
+  --accent-purple: #9b7ad8;
+  --sidebar-w: 240px;
+  --topbar-h: 56px;
+  --radius: 8px;
+  --radius-sm: 5px;
+}
+
+html { font-size: 14px; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background: var(--bg-dark);
+  color: var(--text-primary);
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ===== SIDEBAR ===== */
+.sidebar {
+  width: var(--sidebar-w);
+  background: var(--bg-panel);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  z-index: 10;
+}
+
+.sidebar-logo {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sidebar-logo .logo-icon {
+  width: 32px; height: 32px;
+  background: var(--accent-blue);
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 14px; color: #fff;
+}
+
+.sidebar-logo span {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.sidebar-nav { flex: 1; padding: 12px 0; overflow-y: auto; }
+
+.nav-section-label {
+  padding: 16px 24px 8px;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 24px;
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: all 0.15s;
+  font-size: 13px;
+  font-weight: 500;
+  border-left: 3px solid transparent;
+}
+
+.nav-item:hover { background: var(--bg-hover); color: var(--text-primary); }
+.nav-item.active {
+  background: rgba(74,144,217,0.1);
+  color: var(--accent-blue);
+  border-left-color: var(--accent-blue);
+}
+
+.nav-item svg { width: 18px; height: 18px; flex-shrink: 0; }
+
+.sidebar-footer {
+  padding: 16px 24px;
+  border-top: 1px solid var(--border);
+  display: flex; align-items: center; gap: 10px;
+  font-size: 12px; color: var(--text-secondary);
+}
+
+.sidebar-footer .avatar {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: var(--accent-blue-dim);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700; color: #fff;
+}
+
+/* ===== MAIN ===== */
+.main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+.topbar {
+  height: var(--topbar-h);
+  background: var(--bg-panel);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 28px;
+  flex-shrink: 0;
+}
+
+.topbar-left { display: flex; align-items: center; gap: 16px; }
+.topbar-left h1 { font-size: 16px; font-weight: 600; }
+
+.topbar-filters {
+  display: flex; gap: 8px;
+}
+
+.topbar-filters select, .topbar-filters input {
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  outline: none;
+}
+
+.topbar-right { display: flex; align-items: center; gap: 12px; }
+
+.btn {
+  padding: 7px 16px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.btn-primary { background: var(--accent-blue); color: #fff; }
+.btn-primary:hover { background: var(--accent-blue-dim); }
+.btn-ghost { background: transparent; color: var(--text-secondary); border: 1px solid var(--border); }
+.btn-ghost:hover { background: var(--bg-hover); color: var(--text-primary); }
+
+.content { flex: 1; overflow-y: auto; padding: 24px 28px; }
+
+/* ===== SCREEN (hidden by default) ===== */
+.screen { display: none; }
+.screen.active { display: block; }
+#screen-planning.active { display: flex; flex-direction: column; height: 100%; overflow: hidden; }
+
+/* ===== KPI CARDS ===== */
+.kpi-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.kpi-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+}
+
+.kpi-card .kpi-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.kpi-card .kpi-value {
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 6px;
+}
+
+.kpi-card .kpi-sub {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.kpi-card .kpi-sub .up { color: var(--accent-green); }
+.kpi-card .kpi-sub .down { color: var(--accent-red); }
+
+/* ===== TABLES ===== */
+.panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 24px;
+  overflow: hidden;
+}
+
+.panel-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+
+.panel-header h3 { font-size: 14px; font-weight: 600; }
+
+.data-table { width: 100%; border-collapse: collapse; }
+.data-table th {
+  text-align: left;
+  padding: 10px 16px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--text-muted);
+  font-weight: 600;
+  border-bottom: 1px solid var(--border);
+  background: rgba(0,0,0,0.15);
+}
+.data-table td {
+  padding: 12px 16px;
+  font-size: 13px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-secondary);
+}
+.data-table tr:last-child td { border-bottom: none; }
+.data-table tr:hover td { background: var(--bg-hover); }
+
+/* ===== STATUS BADGES ===== */
+.badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.badge-green { background: var(--accent-green-dim); color: var(--accent-green); }
+.badge-amber { background: var(--accent-amber-dim); color: var(--accent-amber); }
+.badge-red { background: var(--accent-red-dim); color: var(--accent-red); }
+.badge-blue { background: rgba(74,144,217,0.15); color: var(--accent-blue); }
+.badge-gray { background: rgba(107,114,128,0.2); color: var(--text-muted); }
+
+/* ===== GRID LAYOUTS ===== */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; }
+
+/* ===== DASHBOARD: CHARTS (CSS only) ===== */
+.chart-bar-group {
+  display: flex; align-items: flex-end; gap: 6px;
+  height: 140px; padding: 16px 20px 0;
+}
+
+.chart-bar {
+  flex: 1;
+  border-radius: 3px 3px 0 0;
+  position: relative;
+  min-width: 24px;
+}
+
+.chart-bar .chart-bar-label {
+  position: absolute;
+  bottom: -22px;
+  left: 50%; transform: translateX(-50%);
+  font-size: 10px; color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.chart-bar-legend {
+  display: flex; gap: 16px; padding: 28px 20px 16px;
+  font-size: 11px; color: var(--text-secondary);
+}
+
+.chart-bar-legend span::before {
+  content: '';
+  display: inline-block;
+  width: 10px; height: 10px;
+  border-radius: 2px;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+.chart-bar-legend .legend-planned::before { background: var(--accent-blue); }
+.chart-bar-legend .legend-actual::before { background: var(--accent-green); }
+
+/* ===== PLANNING BOARD ===== */
+.planning-container {
+  display: flex;
+  gap: 0;
+  flex: 1;
+  min-height: 0;
+}
+
+.planning-board-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.planning-board {
+  flex: 1;
+  overflow: auto;
+}
+
+.planning-lane {
+  display: flex;
+  align-items: stretch;
+  border-bottom: 1px solid var(--border);
+  min-height: 64px;
+}
+
+.planning-lane-header {
+  width: 160px;
+  flex-shrink: 0;
+  padding: 12px 16px;
+  background: var(--bg-card);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.planning-lane-header small {
+  font-weight: 400;
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.planning-lane-body {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  position: relative;
+  min-width: 700px;
+}
+
+.planning-block {
+  height: 40px;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: filter 0.15s, opacity 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+
+.planning-block:hover { filter: brightness(1.15); }
+
+.planning-block.status-ontrack { background: rgba(74,144,217,0.25); color: var(--accent-blue); border-left: 3px solid var(--accent-blue); }
+.planning-block.status-delayed { background: var(--accent-red-dim); color: var(--accent-red); border-left: 3px solid var(--accent-red); }
+.planning-block.status-completed { background: var(--accent-green-dim); color: var(--accent-green); border-left: 3px solid var(--accent-green); }
+.planning-block.status-blocked { background: var(--accent-amber-dim); color: var(--accent-amber); border-left: 3px solid var(--accent-amber); }
+
+.planning-time-header {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-card);
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+.planning-time-header .time-spacer {
+  width: 160px;
+  flex-shrink: 0;
+  border-right: 1px solid var(--border);
+  padding: 10px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.planning-time-header .time-slots {
+  display: flex;
+  flex: 1;
+  min-width: 700px;
+}
+
+.planning-time-header .time-slot {
+  flex: 1;
+  text-align: center;
+  padding: 10px 0;
+  font-size: 11px;
+  color: var(--text-muted);
+  font-weight: 500;
+  border-right: 1px solid var(--border);
+}
+
+.planning-detail-panel {
+  width: 340px;
+  flex-shrink: 0;
+  background: var(--bg-card);
+  border-left: 1px solid var(--border);
+  border-radius: 0;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 12px;
+}
+
+.detail-row .label { color: var(--text-muted); }
+.detail-row .value { color: var(--text-primary); font-weight: 500; text-align: right; }
+
+/* ===== WORK ORDER DETAIL ===== */
+.wo-detail-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 24px;
+}
+
+.wo-info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+}
+
+.wo-info-item {
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.wo-info-item:nth-child(odd) { border-right: 1px solid var(--border); }
+
+.wo-info-item .label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+
+.wo-info-item .value {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.operation-steps { list-style: none; }
+.operation-step {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+}
+
+.step-number {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: var(--bg-hover);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700; color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.step-number.done { background: var(--accent-green-dim); color: var(--accent-green); }
+.step-number.active { background: rgba(74,144,217,0.2); color: var(--accent-blue); }
+
+.step-info { flex: 1; }
+.step-info .step-name { font-weight: 600; color: var(--text-primary); }
+.step-info .step-meta { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+/* ===== CAPACITY ===== */
+.capacity-bar-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.capacity-bar-row .machine-name {
+  width: 120px;
+  font-size: 13px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.capacity-bar-track {
+  flex: 1;
+  height: 24px;
+  background: var(--bg-dark);
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+}
+
+.capacity-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.3s;
+}
+
+.capacity-bar-row .pct {
+  width: 48px;
+  text-align: right;
+  font-size: 13px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+/* ===== SHOPFLOOR ===== */
+.machine-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.machine-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  border-top: 3px solid var(--text-muted);
+}
+
+.machine-card.running { border-top-color: var(--accent-green); }
+.machine-card.idle { border-top-color: var(--accent-amber); }
+.machine-card.maintenance { border-top-color: var(--accent-red); }
+.machine-card.blocked { border-top-color: var(--accent-red); }
+
+.machine-card-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 14px;
+}
+
+.machine-card-header h4 { font-size: 14px; font-weight: 700; }
+
+.machine-card-body { font-size: 12px; color: var(--text-secondary); }
+.machine-card-body .mc-row {
+  display: flex; justify-content: space-between;
+  padding: 5px 0;
+  border-bottom: 1px solid var(--border);
+}
+.machine-card-body .mc-row:last-child { border-bottom: none; }
+.machine-card-body .mc-row .mc-val { color: var(--text-primary); font-weight: 600; }
+
+/* ===== ANALYTICS ===== */
+.analytics-chart-panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 24px;
+}
+
+.analytics-chart-panel h3 { font-size: 14px; font-weight: 600; margin-bottom: 16px; }
+
+.horizontal-bar {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 10px; font-size: 12px;
+}
+
+.horizontal-bar .hbar-label { width: 80px; color: var(--text-secondary); flex-shrink: 0; text-align: right; }
+
+.hbar-track {
+  flex: 1; height: 18px;
+  background: var(--bg-dark);
+  border-radius: 3px;
+  overflow: hidden;
+  display: flex;
+}
+
+.hbar-fill-planned { background: var(--accent-blue); height: 100%; }
+.hbar-fill-actual { background: var(--accent-green); height: 100%; }
+
+.horizontal-bar .hbar-val { width: 50px; font-size: 11px; color: var(--text-muted); }
+
+/* ===== SCROLLBAR ===== */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--border-light); }
+
+/* ===== PLANNING TOOLBAR ===== */
+.planning-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  gap: 16px;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+}
+
+.planning-toolbar-left { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.planning-toolbar-right { display: flex; align-items: center; gap: 8px; }
+
+.toolbar-date-nav {
+  display: flex; align-items: center; gap: 6px;
+}
+
+.toolbar-date {
+  font-size: 14px; font-weight: 700; min-width: 180px; text-align: center;
+}
+
+.toolbar-filters { display: flex; gap: 4px; }
+
+.plan-filter-btn {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  padding: 5px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.plan-filter-btn:hover { background: var(--bg-hover); color: var(--text-primary); }
+.plan-filter-btn.active { background: var(--accent-blue); color: #fff; border-color: var(--accent-blue); }
+
+.filter-count {
+  display: inline-block;
+  background: rgba(255,255,255,0.15);
+  padding: 0 5px;
+  border-radius: 8px;
+  font-size: 10px;
+  margin-left: 3px;
+}
+
+.plan-filter-btn.active .filter-count { background: rgba(255,255,255,0.25); }
+
+.toolbar-search {
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  outline: none;
+  width: 180px;
+}
+
+/* ===== PLANNING: ENHANCED BLOCKS ===== */
+.block-label {
+  font-size: 10px;
+  font-weight: 700;
+  margin-right: 4px;
+  position: relative;
+  z-index: 1;
+}
+
+.block-part {
+  font-size: 10px;
+  font-weight: 500;
+  opacity: 0.8;
+  position: relative;
+  z-index: 1;
+}
+
+.block-progress {
+  position: absolute;
+  left: 0; bottom: 0;
+  height: 3px;
+  background: rgba(255,255,255,0.3);
+  border-radius: 0 0 5px 5px;
+  transition: width 0.3s;
+}
+
+.planning-block.selected {
+  outline: 2px solid #fff;
+  outline-offset: -1px;
+  z-index: 5;
+}
+
+.block-risk {
+  position: absolute;
+  right: 4px;
+  top: 2px;
+  width: 16px; height: 16px;
+  background: var(--accent-red);
+  color: #fff;
+  border-radius: 50%;
+  font-size: 10px;
+  font-weight: 900;
+  display: flex; align-items: center; justify-content: center;
+  z-index: 2;
+  cursor: help;
+}
+
+/* ===== SETUP BLOCKS ===== */
+.setup-block {
+  width: 20px;
+  height: 28px;
+  background: repeating-linear-gradient(45deg, var(--border), var(--border) 2px, transparent 2px, transparent 5px);
+  border-radius: 3px;
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 8px;
+  font-weight: 700;
+  color: var(--text-muted);
+  opacity: 0.6;
+}
+
+/* ===== LANE LOAD ===== */
+.lane-load {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+/* ===== NOW LINE ===== */
+.now-line {
+  position: absolute;
+  top: 0; bottom: 0;
+  width: 2px;
+  background: var(--accent-red);
+  z-index: 3;
+  pointer-events: none;
+}
+
+.now-line::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -3px;
+  width: 8px; height: 8px;
+  background: var(--accent-red);
+  border-radius: 50%;
+}
+
+/* ===== SUMMARY BAR ===== */
+.planning-summary-bar {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-top: none;
+  border-radius: 0 0 var(--radius) var(--radius);
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+
+.summary-item { display: flex; align-items: center; gap: 6px; }
+
+.summary-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1100px) {
+  .grid-2, .grid-3 { grid-template-columns: 1fr; }
+  .wo-detail-grid { grid-template-columns: 1fr; }
+  .planning-detail-panel { width: 280px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ===== SIDEBAR ===== -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">W</div>
+    <span>WAMER</span>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Genel</div>
+    <div class="nav-item active" data-screen="dashboard">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      Kontrol Paneli
+    </div>
+
+    <div class="nav-section-label">Planlama</div>
+    <div class="nav-item" data-screen="planning">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+      Uretim Panosu
+    </div>
+    <div class="nav-item" data-screen="workorder">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      Is Emirleri
+    </div>
+    <div class="nav-item" data-screen="capacity">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="21" x2="9" y2="9"/><line x1="15" y1="21" x2="15" y2="14"/></svg>
+      Kapasite Planlama
+    </div>
+
+    <div class="nav-section-label">Operasyonlar</div>
+    <div class="nav-item" data-screen="shopfloor">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+      Uretim Sahasi
+    </div>
+    <div class="nav-item" data-screen="analytics">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      Plan - Gerceklesen
+    </div>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="avatar">AK</div>
+    <div>
+      <div style="font-weight:600;color:var(--text-primary)">Ahmet K.</div>
+      <div style="font-size:11px">Uretim Muduru</div>
+    </div>
+  </div>
+</aside>
+
+<!-- ===== MAIN AREA ===== -->
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-left">
+      <h1 id="screen-title">Yonetim Paneli</h1>
+    </div>
+    <div class="topbar-filters">
+      <select>
+        <option>Tum Vardiyalar</option>
+        <option>Sabah Vardiyasi</option>
+        <option>Ogle Vardiyasi</option>
+        <option>Gece Vardiyasi</option>
+      </select>
+      <select>
+        <option>Bu Hafta</option>
+        <option>Bugun</option>
+        <option>Bu Ay</option>
+      </select>
+    </div>
+    <div class="topbar-right">
+      <button class="btn btn-ghost">Disari Aktar</button>
+      <button class="btn btn-primary">+ Yeni Is Emri</button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- ===== 1. YONETIM PANELI ===== -->
+    <div class="screen active" id="screen-dashboard">
+      <div class="kpi-row">
+        <div class="kpi-card">
+          <div class="kpi-label">Aktif Siparisler</div>
+          <div class="kpi-value">47</div>
+          <div class="kpi-sub"><span class="up">+3</span> dunden bu yana</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Geciken Siparisler</div>
+          <div class="kpi-value" style="color:var(--accent-red)">8</div>
+          <div class="kpi-sub"><span class="down">+2</span> dunden bu yana</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Makine Kullanimi</div>
+          <div class="kpi-value">78%</div>
+          <div class="kpi-sub">Hedef: 85%</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Acik Is Emirleri</div>
+          <div class="kpi-value">124</div>
+          <div class="kpi-sub">32 adet bu hafta teslim</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Darbogaz Makine</div>
+          <div class="kpi-value" style="font-size:20px">CNC-07</div>
+          <div class="kpi-sub" style="color:var(--accent-amber)">%98 yuklu</div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <!-- Geciken Siparisler Tablosu -->
+        <div class="panel">
+          <div class="panel-header">
+            <h3>Geciken Siparisler</h3>
+            <span class="badge badge-red">8 siparis</span>
+          </div>
+          <table class="data-table">
+            <thead>
+              <tr><th>IE No</th><th>Musteri</th><th>Parca</th><th>Termin</th><th>Gecikme</th><th>Durum</th></tr>
+            </thead>
+            <tbody>
+              <tr><td style="color:var(--text-primary);font-weight:600">WO-2024-1087</td><td>Ford Otosan</td><td>BRK-4421</td><td>20 Mar</td><td style="color:var(--accent-red)">+3 gun</td><td><span class="badge badge-red">Gecikti</span></td></tr>
+              <tr><td style="color:var(--text-primary);font-weight:600">WO-2024-1092</td><td>Toyota Turkiye</td><td>SHF-2210</td><td>21 Mar</td><td style="color:var(--accent-red)">+2 gun</td><td><span class="badge badge-red">Gecikti</span></td></tr>
+              <tr><td style="color:var(--text-primary);font-weight:600">WO-2024-1078</td><td>Hyundai Assan</td><td>GBX-1155</td><td>19 Mar</td><td style="color:var(--accent-red)">+4 gun</td><td><span class="badge badge-amber">Bloke</span></td></tr>
+              <tr><td style="color:var(--text-primary);font-weight:600">WO-2024-1101</td><td>Mercedes Turk</td><td>CYL-3301</td><td>22 Mar</td><td style="color:var(--accent-red)">+1 gun</td><td><span class="badge badge-red">Gecikti</span></td></tr>
+              <tr><td style="color:var(--text-primary);font-weight:600">WO-2024-1065</td><td>TOFAS</td><td>PST-7789</td><td>18 Mar</td><td style="color:var(--accent-red)">+5 gun</td><td><span class="badge badge-red">Gecikti</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Plan - Gerceklesen Ozeti -->
+        <div class="panel">
+          <div class="panel-header">
+            <h3>Plan - Gerceklesen (Bu Hafta)</h3>
+          </div>
+          <div class="chart-bar-group">
+            <div style="display:flex;flex-direction:column;align-items:center;flex:1;gap:4px">
+              <div style="display:flex;align-items:flex-end;gap:3px;height:120px;width:100%">
+                <div class="chart-bar" style="background:var(--accent-blue);height:90%;flex:1"></div>
+                <div class="chart-bar" style="background:var(--accent-green);height:82%;flex:1"></div>
+              </div>
+              <span style="font-size:10px;color:var(--text-muted)">Pzt</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;flex:1;gap:4px">
+              <div style="display:flex;align-items:flex-end;gap:3px;height:120px;width:100%">
+                <div class="chart-bar" style="background:var(--accent-blue);height:85%;flex:1"></div>
+                <div class="chart-bar" style="background:var(--accent-green);height:78%;flex:1"></div>
+              </div>
+              <span style="font-size:10px;color:var(--text-muted)">Sal</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;flex:1;gap:4px">
+              <div style="display:flex;align-items:flex-end;gap:3px;height:120px;width:100%">
+                <div class="chart-bar" style="background:var(--accent-blue);height:95%;flex:1"></div>
+                <div class="chart-bar" style="background:var(--accent-green);height:70%;flex:1"></div>
+              </div>
+              <span style="font-size:10px;color:var(--text-muted)">Car</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;flex:1;gap:4px">
+              <div style="display:flex;align-items:flex-end;gap:3px;height:120px;width:100%">
+                <div class="chart-bar" style="background:var(--accent-blue);height:80%;flex:1"></div>
+                <div class="chart-bar" style="background:var(--accent-green);height:75%;flex:1"></div>
+              </div>
+              <span style="font-size:10px;color:var(--text-muted)">Per</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;flex:1;gap:4px">
+              <div style="display:flex;align-items:flex-end;gap:3px;height:120px;width:100%">
+                <div class="chart-bar" style="background:var(--accent-blue);height:75%;flex:1"></div>
+                <div class="chart-bar" style="background:var(--accent-green);height:68%;flex:1"></div>
+              </div>
+              <span style="font-size:10px;color:var(--text-muted)">Cum</span>
+            </div>
+          </div>
+          <div class="chart-bar-legend">
+            <span class="legend-planned">Planlanan Uretim</span>
+            <span class="legend-actual">Gerceklesen Uretim</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Son Is Emirleri -->
+      <div class="panel">
+        <div class="panel-header">
+          <h3>Son Is Emirleri</h3>
+          <button class="btn btn-ghost" style="font-size:11px">Tumunu Gor</button>
+        </div>
+        <table class="data-table">
+          <thead>
+            <tr><th>IE No</th><th>Musteri</th><th>Parca No</th><th>Miktar</th><th>Makine</th><th>Termin</th><th>Oncelik</th><th>Durum</th></tr>
+          </thead>
+          <tbody>
+            <tr><td style="color:var(--text-primary);font-weight:600">WO-2024-1105</td><td>Ford Otosan</td><td>BRK-4421</td><td>500</td><td>CNC-03</td><td>26 Mar</td><td><span class="badge badge-red">Kritik</span></td><td><span class="badge badge-blue">Devam Ediyor</span></td></tr>
+            <tr><td style="color:var(--text-primary);font-weight:600">WO-2024-1104</td><td>Toyota Turkiye</td><td>SHF-2210</td><td>1.200</td><td>CNC-07</td><td>25 Mar</td><td><span class="badge badge-amber">Yuksek</span></td><td><span class="badge badge-blue">Devam Ediyor</span></td></tr>
+            <tr><td style="color:var(--text-primary);font-weight:600">WO-2024-1103</td><td>Hyundai Assan</td><td>GBX-1155</td><td>300</td><td>CNC-01</td><td>27 Mar</td><td><span class="badge badge-gray">Normal</span></td><td><span class="badge badge-green">Zamaninda</span></td></tr>
+            <tr><td style="color:var(--text-primary);font-weight:600">WO-2024-1102</td><td>Mercedes Turk</td><td>CYL-3301</td><td>750</td><td>CNC-05</td><td>24 Mar</td><td><span class="badge badge-amber">Yuksek</span></td><td><span class="badge badge-green">Tamamlandi</span></td></tr>
+            <tr><td style="color:var(--text-primary);font-weight:600">WO-2024-1101</td><td>TOFAS</td><td>PST-7789</td><td>2.000</td><td>CNC-02</td><td>28 Mar</td><td><span class="badge badge-gray">Normal</span></td><td><span class="badge badge-blue">Devam Ediyor</span></td></tr>
+            <tr><td style="color:var(--text-primary);font-weight:600">WO-2024-1100</td><td>Karsan</td><td>AXL-8810</td><td>400</td><td>CNC-04</td><td>29 Mar</td><td><span class="badge badge-gray">Normal</span></td><td><span class="badge badge-amber">Sirada</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ===== 2. URETIM PLANLAMA PANOSU ===== -->
+    <div class="screen" id="screen-planning">
+      <!-- Ust Filtre Cubugu -->
+      <div class="planning-toolbar">
+        <div class="planning-toolbar-left">
+          <div class="toolbar-date-nav">
+            <button class="btn btn-ghost" style="padding:5px 8px">&larr;</button>
+            <span class="toolbar-date">24 Mart 2026, Sali</span>
+            <button class="btn btn-ghost" style="padding:5px 8px">&rarr;</button>
+            <button class="btn btn-ghost" style="margin-left:4px;font-size:11px">Bugun</button>
+          </div>
+          <div class="toolbar-filters">
+            <button class="plan-filter-btn active" data-filter="all">Tumu <span class="filter-count">23</span></button>
+            <button class="plan-filter-btn" data-filter="ontrack">Zamaninda <span class="filter-count">14</span></button>
+            <button class="plan-filter-btn" data-filter="delayed">Geciken <span class="filter-count">4</span></button>
+            <button class="plan-filter-btn" data-filter="blocked">Bloke <span class="filter-count">2</span></button>
+            <button class="plan-filter-btn" data-filter="completed">Tamamlanan <span class="filter-count">3</span></button>
+          </div>
+        </div>
+        <div class="planning-toolbar-right">
+          <input type="text" placeholder="IE veya parca ara..." class="toolbar-search">
+          <button class="btn btn-ghost" style="font-size:11px">Plani Yayinla</button>
+        </div>
+      </div>
+
+      <div class="planning-container">
+        <div class="planning-board-wrapper">
+        <div class="planning-board" style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius) var(--radius) 0 0;overflow:auto">
+          <div class="planning-time-header">
+            <div class="time-spacer">Makine</div>
+            <div class="time-slots" id="planning-time-slots">
+              <div class="time-slot">06:00</div>
+              <div class="time-slot">08:00</div>
+              <div class="time-slot">10:00</div>
+              <div class="time-slot">12:00</div>
+              <div class="time-slot">14:00</div>
+              <div class="time-slot">16:00</div>
+              <div class="time-slot">18:00</div>
+              <div class="time-slot">20:00</div>
+              <div class="time-slot">22:00</div>
+            </div>
+          </div>
+
+          <!-- CNC-01 -->
+          <div class="planning-lane">
+            <div class="planning-lane-header">CNC-01<small>Torna Merkezi</small><span class="lane-load">54%</span></div>
+            <div class="planning-lane-body">
+              <div class="planning-block status-completed" style="width:14%" data-wo="WO-1098" onclick="selectBlock(this)">
+                <span class="block-label">WO-1098</span>
+                <span class="block-part">GBX-1155</span>
+                <div class="block-progress" style="width:100%"></div>
+              </div>
+              <div class="setup-block">A</div>
+              <div class="planning-block status-ontrack" style="width:22%" data-wo="WO-1103" onclick="selectBlock(this)">
+                <span class="block-label">WO-1103</span>
+                <span class="block-part">GBX-1155</span>
+                <div class="block-progress" style="width:62%"></div>
+              </div>
+              <div class="setup-block">A</div>
+              <div class="planning-block status-ontrack" style="width:18%" data-wo="WO-1110" onclick="selectBlock(this)">
+                <span class="block-label">WO-1110</span>
+                <span class="block-part">FLG-2200</span>
+                <div class="block-progress" style="width:0%"></div>
+              </div>
+              <div class="now-line" id="now-line-1"></div>
+            </div>
+          </div>
+
+          <!-- CNC-02 -->
+          <div class="planning-lane">
+            <div class="planning-lane-header">CNC-02<small>5 Eksen Freze</small><span class="lane-load" style="color:var(--accent-red)">91%</span></div>
+            <div class="planning-lane-body">
+              <div class="planning-block status-ontrack" style="width:30%" data-wo="WO-1101" onclick="selectBlock(this)">
+                <span class="block-label">WO-1101</span>
+                <span class="block-part">PST-7789</span>
+                <div class="block-progress" style="width:71%"></div>
+              </div>
+              <div class="setup-block">A</div>
+              <div class="planning-block status-blocked" style="width:12%" data-wo="WO-1115" onclick="selectBlock(this)">
+                <span class="block-label">WO-1115</span>
+                <span class="block-part">HSG-4400</span>
+                <span class="block-risk" title="Malzeme eksik">!</span>
+                <div class="block-progress" style="width:0%"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- CNC-03 -->
+          <div class="planning-lane">
+            <div class="planning-lane-header">CNC-03<small>Yatay Freze</small><span class="lane-load" style="color:var(--accent-amber)">88%</span></div>
+            <div class="planning-lane-body">
+              <div class="planning-block status-delayed" style="width:28%" data-wo="WO-1087" onclick="selectBlock(this)">
+                <span class="block-label">WO-1087</span>
+                <span class="block-part">BRK-4421</span>
+                <div class="block-progress" style="width:45%"></div>
+              </div>
+              <div class="planning-block status-ontrack" style="width:20%" data-wo="WO-1105" onclick="selectBlock(this)">
+                <span class="block-label">WO-1105</span>
+                <span class="block-part">BRK-4421</span>
+                <div class="block-progress" style="width:0%"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- CNC-04 -->
+          <div class="planning-lane">
+            <div class="planning-lane-header">CNC-04<small>Dikey Freze</small><span class="lane-load" style="color:var(--accent-green)">65%</span></div>
+            <div class="planning-lane-body">
+              <div class="planning-block status-ontrack" style="width:16%" data-wo="WO-1100" onclick="selectBlock(this)">
+                <span class="block-label">WO-1100</span>
+                <span class="block-part">AXL-8810</span>
+                <div class="block-progress" style="width:0%"></div>
+              </div>
+              <div class="setup-block">A</div>
+              <div class="planning-block status-ontrack" style="width:24%" data-wo="WO-1108" onclick="selectBlock(this)">
+                <span class="block-label">WO-1108</span>
+                <span class="block-part">RNG-5500</span>
+                <div class="block-progress" style="width:0%"></div>
+              </div>
+              <div class="setup-block">A</div>
+              <div class="planning-block status-ontrack" style="width:14%" data-wo="WO-1120" onclick="selectBlock(this)">
+                <span class="block-label">WO-1120</span>
+                <span class="block-part">CAP-6600</span>
+                <span class="block-risk" title="Takim kontrol edilmeli">!</span>
+                <div class="block-progress" style="width:0%"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- CNC-05 -->
+          <div class="planning-lane">
+            <div class="planning-lane-header">CNC-05<small>Torna Merkezi</small><span class="lane-load">74%</span></div>
+            <div class="planning-lane-body">
+              <div class="planning-block status-completed" style="width:22%" data-wo="WO-1102" onclick="selectBlock(this)">
+                <span class="block-label">WO-1102</span>
+                <span class="block-part">CYL-3301</span>
+                <div class="block-progress" style="width:100%"></div>
+              </div>
+              <div class="setup-block">A</div>
+              <div class="planning-block status-ontrack" style="width:18%" data-wo="WO-1112" onclick="selectBlock(this)">
+                <span class="block-label">WO-1112</span>
+                <span class="block-part">CYL-3302</span>
+                <div class="block-progress" style="width:35%"></div>
+              </div>
+              <div class="planning-block status-delayed" style="width:16%" data-wo="WO-1118" onclick="selectBlock(this)">
+                <span class="block-label">WO-1118</span>
+                <span class="block-part">PIN-7700</span>
+                <div class="block-progress" style="width:0%"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- CNC-06 -->
+          <div class="planning-lane">
+            <div class="planning-lane-header">CNC-06<small>Taslama</small><span class="lane-load" style="color:var(--accent-green)">58%</span></div>
+            <div class="planning-lane-body">
+              <div class="planning-block status-ontrack" style="width:34%" data-wo="WO-1095" onclick="selectBlock(this)">
+                <span class="block-label">WO-1095</span>
+                <span class="block-part">SHF-2211</span>
+                <div class="block-progress" style="width:73%"></div>
+              </div>
+              <div class="setup-block">A</div>
+              <div class="planning-block status-ontrack" style="width:18%" data-wo="WO-1125" onclick="selectBlock(this)">
+                <span class="block-label">WO-1125</span>
+                <span class="block-part">GER-8800</span>
+                <div class="block-progress" style="width:0%"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- CNC-07 -->
+          <div class="planning-lane">
+            <div class="planning-lane-header">CNC-07<small>5 Eksen Freze</small><span class="lane-load" style="color:var(--accent-red)">98%</span></div>
+            <div class="planning-lane-body">
+              <div class="planning-block status-delayed" style="width:26%" data-wo="WO-1092" onclick="selectBlock(this)">
+                <span class="block-label">WO-1092</span>
+                <span class="block-part">SHF-2210</span>
+                <div class="block-progress" style="width:82%"></div>
+              </div>
+              <div class="planning-block status-ontrack" style="width:24%" data-wo="WO-1104" onclick="selectBlock(this)">
+                <span class="block-label">WO-1104</span>
+                <span class="block-part">SHF-2210</span>
+                <div class="block-progress" style="width:10%"></div>
+              </div>
+              <div class="planning-block status-blocked" style="width:14%" data-wo="WO-1130" onclick="selectBlock(this)">
+                <span class="block-label">WO-1130</span>
+                <span class="block-part">VLV-9900</span>
+                <span class="block-risk" title="Malzeme + takim eksik">!</span>
+                <div class="block-progress" style="width:0%"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- CNC-08 -->
+          <div class="planning-lane">
+            <div class="planning-lane-header">CNC-08<small>Torna</small><span class="lane-load" style="color:var(--accent-green)">52%</span></div>
+            <div class="planning-lane-body">
+              <div class="planning-block status-completed" style="width:18%" data-wo="WO-1080" onclick="selectBlock(this)">
+                <span class="block-label">WO-1080</span>
+                <span class="block-part">BRG-1100</span>
+                <div class="block-progress" style="width:100%"></div>
+              </div>
+              <div class="setup-block">A</div>
+              <div class="planning-block status-ontrack" style="width:28%" data-wo="WO-1109" onclick="selectBlock(this)">
+                <span class="block-label">WO-1109</span>
+                <span class="block-part">BRG-1101</span>
+                <div class="block-progress" style="width:40%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Alt Ozet Cubugu -->
+        <div class="planning-summary-bar">
+          <div class="summary-item"><span class="summary-dot" style="background:var(--accent-blue)"></span>Zamaninda: <strong>14</strong></div>
+          <div class="summary-item"><span class="summary-dot" style="background:var(--accent-red)"></span>Geciken: <strong>4</strong></div>
+          <div class="summary-item"><span class="summary-dot" style="background:var(--accent-amber)"></span>Bloke: <strong>2</strong></div>
+          <div class="summary-item"><span class="summary-dot" style="background:var(--accent-green)"></span>Tamamlanan: <strong>3</strong></div>
+          <div class="summary-item" style="margin-left:auto;color:var(--text-muted)">Toplam: 23 is emri &middot; 8 makine &middot; Ort. doluluk: %78</div>
+        </div>
+        </div><!-- /planning-board-wrapper -->
+
+        <!-- Detay Paneli -->
+        <div class="planning-detail-panel" id="planning-detail">
+          <div id="detail-content">
+            <div style="margin-bottom:16px">
+              <span class="badge badge-red" style="margin-bottom:8px;display:inline-block">Gecikti</span>
+              <h3 style="font-size:16px;font-weight:700">WO-2024-1087</h3>
+              <p style="font-size:12px;color:var(--text-muted);margin-top:4px">Ford Otosan - BRK-4421</p>
+            </div>
+            <div class="detail-row"><span class="label">Musteri</span><span class="value">Ford Otosan</span></div>
+            <div class="detail-row"><span class="label">Parca No</span><span class="value">BRK-4421</span></div>
+            <div class="detail-row"><span class="label">Miktar</span><span class="value">500 adet</span></div>
+            <div class="detail-row"><span class="label">Makine</span><span class="value">CNC-03</span></div>
+            <div class="detail-row"><span class="label">Oncelik</span><span class="value" style="color:var(--accent-red)">Kritik</span></div>
+            <div class="detail-row"><span class="label">Termin</span><span class="value">20 Mar 2024</span></div>
+            <div class="detail-row"><span class="label">Plan. Baslangic</span><span class="value">17 Mar, 06:00</span></div>
+            <div class="detail-row"><span class="label">Plan. Bitis</span><span class="value">20 Mar, 14:00</span></div>
+            <div class="detail-row"><span class="label">Fiili Baslangic</span><span class="value">18 Mar, 08:00</span></div>
+            <div class="detail-row"><span class="label">Fiili Bitis</span><span class="value" style="color:var(--accent-red)">Devam Ediyor</span></div>
+            <div class="detail-row"><span class="label">Gecikme</span><span class="value" style="color:var(--accent-red)">+3 gun</span></div>
+            <div class="detail-row"><span class="label">Gecikme Nedeni</span><span class="value">Op 20'de takim kirilmasi</span></div>
+            <div style="margin-top:16px">
+              <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px">
+                <span style="color:var(--text-muted)">Ilerleme</span><span style="font-weight:700">45%</span>
+              </div>
+              <div style="height:6px;background:var(--bg-dark);border-radius:3px;overflow:hidden">
+                <div style="width:45%;height:100%;background:var(--accent-red);border-radius:3px"></div>
+              </div>
+              <div style="font-size:10px;color:var(--text-muted);margin-top:4px">225 / 500 adet</div>
+            </div>
+            <div style="margin-top:20px">
+              <h4 style="font-size:12px;font-weight:600;color:var(--text-muted);margin-bottom:10px;text-transform:uppercase;letter-spacing:1px">Operasyonlar</h4>
+              <div class="detail-row"><span class="label">Op 10 - Kaba Tornalama</span><span class="value"><span class="badge badge-green">Tamam</span></span></div>
+              <div class="detail-row"><span class="label">Op 20 - Hassas Freze</span><span class="value"><span class="badge badge-blue">Calisiyor</span></span></div>
+              <div class="detail-row"><span class="label">Op 30 - Delme</span><span class="value"><span class="badge badge-gray">Bekliyor</span></span></div>
+              <div class="detail-row"><span class="label">Op 40 - Kontrol</span><span class="value"><span class="badge badge-gray">Bekliyor</span></span></div>
+            </div>
+            <div style="margin-top:16px">
+              <h4 style="font-size:12px;font-weight:600;color:var(--text-muted);margin-bottom:10px;text-transform:uppercase;letter-spacing:1px">Hazirlik Durumu</h4>
+              <div class="detail-row"><span class="label">Hammadde</span><span class="value" style="color:var(--accent-green)">Hazir</span></div>
+              <div class="detail-row"><span class="label">Takim / Aparat</span><span class="value" style="color:var(--accent-green)">Hazir</span></div>
+              <div class="detail-row"><span class="label">CNC Program</span><span class="value" style="color:var(--accent-green)">Yuklendi</span></div>
+              <div class="detail-row"><span class="label">Teknik Resim</span><span class="value" style="color:var(--accent-green)">Mevcut</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 3. IS EMRI DETAYI ===== -->
+    <div class="screen" id="screen-workorder">
+      <div class="wo-detail-grid">
+        <div>
+          <!-- Is Emri Bilgileri -->
+          <div class="panel">
+            <div class="panel-header">
+              <h3>WO-2024-1105 &mdash; Ford Otosan</h3>
+              <span class="badge badge-blue">Devam Ediyor</span>
+            </div>
+            <div class="wo-info-grid">
+              <div class="wo-info-item"><div class="label">Is Emri No</div><div class="value">WO-2024-1105</div></div>
+              <div class="wo-info-item"><div class="label">Musteri</div><div class="value">Ford Otosan</div></div>
+              <div class="wo-info-item"><div class="label">Parca No</div><div class="value">BRK-4421</div></div>
+              <div class="wo-info-item"><div class="label">Miktar</div><div class="value">500 adet</div></div>
+              <div class="wo-info-item"><div class="label">Termin</div><div class="value">26 Mar 2024</div></div>
+              <div class="wo-info-item"><div class="label">Oncelik</div><div class="value" style="color:var(--accent-red)">Kritik</div></div>
+              <div class="wo-info-item"><div class="label">Atanan Makine</div><div class="value">CNC-03</div></div>
+              <div class="wo-info-item"><div class="label">Planlanan Sure</div><div class="value">32 saat</div></div>
+              <div class="wo-info-item"><div class="label">Plan. Baslangic</div><div class="value">22 Mar, 06:00</div></div>
+              <div class="wo-info-item"><div class="label">Plan. Bitis</div><div class="value">25 Mar, 14:00</div></div>
+              <div class="wo-info-item"><div class="label">Fiili Baslangic</div><div class="value">22 Mar, 07:30</div></div>
+              <div class="wo-info-item"><div class="label">Fiili Bitis</div><div class="value" style="color:var(--accent-amber)">Devam Ediyor</div></div>
+            </div>
+          </div>
+
+          <!-- Operasyon Adimlari -->
+          <div class="panel" style="margin-top:24px">
+            <div class="panel-header"><h3>Operasyon Rotasi</h3></div>
+            <ul class="operation-steps">
+              <li class="operation-step">
+                <div class="step-number done">1</div>
+                <div class="step-info">
+                  <div class="step-name">Op 10 - Kaba Tornalama</div>
+                  <div class="step-meta">CNC-03 &middot; 8s plan &middot; 7.5s fiili &middot; <span style="color:var(--accent-green)">Tamamlandi</span></div>
+                </div>
+                <span class="badge badge-green">Tamam</span>
+              </li>
+              <li class="operation-step">
+                <div class="step-number done">2</div>
+                <div class="step-info">
+                  <div class="step-name">Op 20 - Hassas Frezeleme</div>
+                  <div class="step-meta">CNC-03 &middot; 10s plan &middot; 9.5s fiili &middot; <span style="color:var(--accent-green)">Tamamlandi</span></div>
+                </div>
+                <span class="badge badge-green">Tamam</span>
+              </li>
+              <li class="operation-step">
+                <div class="step-number active">3</div>
+                <div class="step-info">
+                  <div class="step-name">Op 30 - Capraz Delme</div>
+                  <div class="step-meta">CNC-03 &middot; 6s plan &middot; 3.2s gecen &middot; <span style="color:var(--accent-blue)">Calisiyor</span></div>
+                </div>
+                <span class="badge badge-blue">Calisiyor</span>
+              </li>
+              <li class="operation-step">
+                <div class="step-number">4</div>
+                <div class="step-info">
+                  <div class="step-name">Op 40 - Capak Alma</div>
+                  <div class="step-meta">Manuel &middot; 4s plan</div>
+                </div>
+                <span class="badge badge-gray">Bekliyor</span>
+              </li>
+              <li class="operation-step">
+                <div class="step-number">5</div>
+                <div class="step-info">
+                  <div class="step-name">Op 50 - Son Kontrol</div>
+                  <div class="step-meta">Kalite Istasyonu &middot; 4s plan</div>
+                </div>
+                <span class="badge badge-gray">Bekliyor</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Sag panel: ilerleme / notlar -->
+        <div>
+          <div class="panel">
+            <div class="panel-header"><h3>Ilerleme</h3></div>
+            <div style="padding:20px">
+              <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px">
+                <span style="color:var(--text-muted)">Toplam Tamamlanma</span>
+                <span style="font-weight:700">62%</span>
+              </div>
+              <div style="height:8px;background:var(--bg-dark);border-radius:4px;overflow:hidden">
+                <div style="width:62%;height:100%;background:var(--accent-blue);border-radius:4px"></div>
+              </div>
+              <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-muted);margin-top:12px">
+                <span>310 / 500 adet</span>
+                <span>Tah. bitis: 25 Mar, 18:00</span>
+              </div>
+            </div>
+          </div>
+          <div class="panel" style="margin-top:24px">
+            <div class="panel-header"><h3>Gecikme Notlari</h3></div>
+            <div style="padding:16px 20px;font-size:12px;color:var(--text-secondary);line-height:1.6">
+              <div style="padding:10px 0;border-bottom:1px solid var(--border)">
+                <span style="color:var(--text-muted)">22 Mar, 07:30</span><br>
+                <span style="color:var(--text-primary);font-weight:500">Gec baslama</span> - Gece bakimi nedeniyle makine isinma gecikmesi.
+              </div>
+              <div style="padding:10px 0;border-bottom:1px solid var(--border)">
+                <span style="color:var(--text-muted)">23 Mar, 14:00</span><br>
+                <span style="color:var(--text-primary);font-weight:500">Takim degisimi</span> - Op 20'de insert degisimi. 45 dk durus.
+              </div>
+              <div style="padding:10px 0;">
+                <span style="color:var(--text-muted)">24 Mar, 09:15</span><br>
+                <span style="color:var(--text-primary);font-weight:500">Malzeme bekleme</span> - Depodan ham parca teslimi 2 saat gecikti.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 4. KAPASITE PLANLAMA ===== -->
+    <div class="screen" id="screen-capacity">
+      <div class="kpi-row" style="grid-template-columns:repeat(4,1fr)">
+        <div class="kpi-card">
+          <div class="kpi-label">Ort. Kullanim</div>
+          <div class="kpi-value">78%</div>
+          <div class="kpi-sub">Hedef: 85%</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Asiri Yuklu Makineler</div>
+          <div class="kpi-value" style="color:var(--accent-red)">3</div>
+          <div class="kpi-sub">CNC-02, CNC-03, CNC-07</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Bos Kapasite</div>
+          <div class="kpi-value" style="color:var(--accent-green)">42s</div>
+          <div class="kpi-sub">Bu hafta kalan</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Vardiya Dolulugu</div>
+          <div class="kpi-value">2/3</div>
+          <div class="kpi-sub">Gece vardiyasi eksik</div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="panel">
+          <div class="panel-header"><h3>Makine Yuku - Bu Hafta</h3></div>
+          <div>
+            <div class="capacity-bar-row">
+              <span class="machine-name">CNC-01</span>
+              <div class="capacity-bar-track"><div class="capacity-bar-fill" style="width:72%;background:var(--accent-blue)"></div></div>
+              <span class="pct">72%</span>
+            </div>
+            <div class="capacity-bar-row">
+              <span class="machine-name">CNC-02</span>
+              <div class="capacity-bar-track"><div class="capacity-bar-fill" style="width:91%;background:var(--accent-red)"></div></div>
+              <span class="pct" style="color:var(--accent-red)">91%</span>
+            </div>
+            <div class="capacity-bar-row">
+              <span class="machine-name">CNC-03</span>
+              <div class="capacity-bar-track"><div class="capacity-bar-fill" style="width:88%;background:var(--accent-amber)"></div></div>
+              <span class="pct" style="color:var(--accent-amber)">88%</span>
+            </div>
+            <div class="capacity-bar-row">
+              <span class="machine-name">CNC-04</span>
+              <div class="capacity-bar-track"><div class="capacity-bar-fill" style="width:65%;background:var(--accent-blue)"></div></div>
+              <span class="pct">65%</span>
+            </div>
+            <div class="capacity-bar-row">
+              <span class="machine-name">CNC-05</span>
+              <div class="capacity-bar-track"><div class="capacity-bar-fill" style="width:74%;background:var(--accent-blue)"></div></div>
+              <span class="pct">74%</span>
+            </div>
+            <div class="capacity-bar-row">
+              <span class="machine-name">CNC-06</span>
+              <div class="capacity-bar-track"><div class="capacity-bar-fill" style="width:58%;background:var(--accent-green)"></div></div>
+              <span class="pct">58%</span>
+            </div>
+            <div class="capacity-bar-row">
+              <span class="machine-name">CNC-07</span>
+              <div class="capacity-bar-track"><div class="capacity-bar-fill" style="width:98%;background:var(--accent-red)"></div></div>
+              <span class="pct" style="color:var(--accent-red)">98%</span>
+            </div>
+            <div class="capacity-bar-row">
+              <span class="machine-name">CNC-08</span>
+              <div class="capacity-bar-track"><div class="capacity-bar-fill" style="width:52%;background:var(--accent-green)"></div></div>
+              <span class="pct">52%</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header"><h3>Vardiya Kullanimi</h3></div>
+          <table class="data-table">
+            <thead>
+              <tr><th>Vardiya</th><th>Saat</th><th>Aktif Makine</th><th>Kullanim</th><th>Durum</th></tr>
+            </thead>
+            <tbody>
+              <tr><td style="font-weight:600;color:var(--text-primary)">Sabah (06-14)</td><td>64s</td><td>8 / 8</td><td>92%</td><td><span class="badge badge-green">Optimal</span></td></tr>
+              <tr><td style="font-weight:600;color:var(--text-primary)">Ogle (14-22)</td><td>56s</td><td>7 / 8</td><td>78%</td><td><span class="badge badge-green">Iyi</span></td></tr>
+              <tr><td style="font-weight:600;color:var(--text-primary)">Gece (22-06)</td><td>32s</td><td>4 / 8</td><td>45%</td><td><span class="badge badge-amber">Dusuk</span></td></tr>
+            </tbody>
+          </table>
+          <div style="padding:16px 20px">
+            <h4 style="font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px">Darbogaz Ozeti</h4>
+            <div style="font-size:12px;color:var(--text-secondary);line-height:1.8">
+              <div><span style="color:var(--accent-red);font-weight:600">CNC-07</span> - %98 yuklu. WO-1130'u CNC-04'e (%58 yuklu) aktarmayi dusunun.</div>
+              <div><span style="color:var(--accent-red);font-weight:600">CNC-02</span> - %91 yuklu. WO-1115 malzeme bekliyor.</div>
+              <div><span style="color:var(--accent-amber);font-weight:600">CNC-03</span> - %88 yuklu. Geciken siparis WO-1087 isleniyor.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 5. URETIM SAHASI IZLEME ===== -->
+    <div class="screen" id="screen-shopfloor">
+      <div class="kpi-row" style="grid-template-columns:repeat(5,1fr)">
+        <div class="kpi-card"><div class="kpi-label">Calisiyor</div><div class="kpi-value" style="color:var(--accent-green)">5</div></div>
+        <div class="kpi-card"><div class="kpi-label">Bosta</div><div class="kpi-value" style="color:var(--accent-amber)">1</div></div>
+        <div class="kpi-card"><div class="kpi-label">Bloke</div><div class="kpi-value" style="color:var(--accent-red)">1</div></div>
+        <div class="kpi-card"><div class="kpi-label">Bakimda</div><div class="kpi-value" style="color:var(--accent-red)">1</div></div>
+        <div class="kpi-card"><div class="kpi-label">Bugunun Uretimi</div><div class="kpi-value">1.247</div><div class="kpi-sub">adet uretildi</div></div>
+      </div>
+
+      <div class="machine-grid">
+        <div class="machine-card running">
+          <div class="machine-card-header">
+            <h4>CNC-01</h4>
+            <span class="badge badge-green">Calisiyor</span>
+          </div>
+          <div class="machine-card-body">
+            <div class="mc-row"><span>Tip</span><span class="mc-val">Torna Merkezi</span></div>
+            <div class="mc-row"><span>Mevcut IE</span><span class="mc-val">WO-1103</span></div>
+            <div class="mc-row"><span>Parca</span><span class="mc-val">GBX-1155</span></div>
+            <div class="mc-row"><span>Operator</span><span class="mc-val">M. Yilmaz</span></div>
+            <div class="mc-row"><span>Uretilen</span><span class="mc-val">185 / 300</span></div>
+            <div class="mc-row"><span>Cevrim Suresi</span><span class="mc-val">4,2 dk</span></div>
+          </div>
+        </div>
+        <div class="machine-card running">
+          <div class="machine-card-header">
+            <h4>CNC-02</h4>
+            <span class="badge badge-green">Calisiyor</span>
+          </div>
+          <div class="machine-card-body">
+            <div class="mc-row"><span>Tip</span><span class="mc-val">5 Eksen Freze</span></div>
+            <div class="mc-row"><span>Mevcut IE</span><span class="mc-val">WO-1101</span></div>
+            <div class="mc-row"><span>Parca</span><span class="mc-val">PST-7789</span></div>
+            <div class="mc-row"><span>Operator</span><span class="mc-val">E. Demir</span></div>
+            <div class="mc-row"><span>Uretilen</span><span class="mc-val">1.420 / 2.000</span></div>
+            <div class="mc-row"><span>Cevrim Suresi</span><span class="mc-val">2,8 dk</span></div>
+          </div>
+        </div>
+        <div class="machine-card running">
+          <div class="machine-card-header">
+            <h4>CNC-03</h4>
+            <span class="badge badge-green">Calisiyor</span>
+          </div>
+          <div class="machine-card-body">
+            <div class="mc-row"><span>Tip</span><span class="mc-val">Yatay Freze</span></div>
+            <div class="mc-row"><span>Mevcut IE</span><span class="mc-val">WO-1105</span></div>
+            <div class="mc-row"><span>Parca</span><span class="mc-val">BRK-4421</span></div>
+            <div class="mc-row"><span>Operator</span><span class="mc-val">H. Kaya</span></div>
+            <div class="mc-row"><span>Uretilen</span><span class="mc-val">310 / 500</span></div>
+            <div class="mc-row"><span>Cevrim Suresi</span><span class="mc-val">5,1 dk</span></div>
+          </div>
+        </div>
+        <div class="machine-card idle">
+          <div class="machine-card-header">
+            <h4>CNC-04</h4>
+            <span class="badge badge-amber">Bosta</span>
+          </div>
+          <div class="machine-card-body">
+            <div class="mc-row"><span>Tip</span><span class="mc-val">Dikey Freze</span></div>
+            <div class="mc-row"><span>Mevcut IE</span><span class="mc-val">-</span></div>
+            <div class="mc-row"><span>Operator</span><span class="mc-val">Atanmamis</span></div>
+            <div class="mc-row"><span>Bosta (saat)</span><span class="mc-val">09:45'ten beri</span></div>
+            <div class="mc-row"><span>Neden</span><span class="mc-val">Ayar bekleniyor</span></div>
+            <div class="mc-row"><span>Siradaki IE</span><span class="mc-val">WO-1100</span></div>
+          </div>
+        </div>
+        <div class="machine-card running">
+          <div class="machine-card-header">
+            <h4>CNC-05</h4>
+            <span class="badge badge-green">Calisiyor</span>
+          </div>
+          <div class="machine-card-body">
+            <div class="mc-row"><span>Tip</span><span class="mc-val">Torna Merkezi</span></div>
+            <div class="mc-row"><span>Mevcut IE</span><span class="mc-val">WO-1112</span></div>
+            <div class="mc-row"><span>Parca</span><span class="mc-val">CYL-3302</span></div>
+            <div class="mc-row"><span>Operator</span><span class="mc-val">A. Ozturk</span></div>
+            <div class="mc-row"><span>Uretilen</span><span class="mc-val">520 / 750</span></div>
+            <div class="mc-row"><span>Cevrim Suresi</span><span class="mc-val">3,4 dk</span></div>
+          </div>
+        </div>
+        <div class="machine-card running">
+          <div class="machine-card-header">
+            <h4>CNC-06</h4>
+            <span class="badge badge-green">Calisiyor</span>
+          </div>
+          <div class="machine-card-body">
+            <div class="mc-row"><span>Tip</span><span class="mc-val">Taslama</span></div>
+            <div class="mc-row"><span>Mevcut IE</span><span class="mc-val">WO-1095</span></div>
+            <div class="mc-row"><span>Parca</span><span class="mc-val">SHF-2211</span></div>
+            <div class="mc-row"><span>Operator</span><span class="mc-val">S. Celik</span></div>
+            <div class="mc-row"><span>Uretilen</span><span class="mc-val">88 / 120</span></div>
+            <div class="mc-row"><span>Cevrim Suresi</span><span class="mc-val">8,5 dk</span></div>
+          </div>
+        </div>
+        <div class="machine-card blocked">
+          <div class="machine-card-header">
+            <h4>CNC-07</h4>
+            <span class="badge badge-red">Bloke</span>
+          </div>
+          <div class="machine-card-body">
+            <div class="mc-row"><span>Tip</span><span class="mc-val">5 Eksen Freze</span></div>
+            <div class="mc-row"><span>Mevcut IE</span><span class="mc-val">WO-1104</span></div>
+            <div class="mc-row"><span>Parca</span><span class="mc-val">SHF-2210</span></div>
+            <div class="mc-row"><span>Operator</span><span class="mc-val">K. Arslan</span></div>
+            <div class="mc-row"><span>Bloke (saat)</span><span class="mc-val">11:20'den beri</span></div>
+            <div class="mc-row"><span>Neden</span><span class="mc-val" style="color:var(--accent-red)">Takim kirilmasi</span></div>
+          </div>
+        </div>
+        <div class="machine-card maintenance">
+          <div class="machine-card-header">
+            <h4>CNC-08</h4>
+            <span class="badge badge-red">Bakimda</span>
+          </div>
+          <div class="machine-card-body">
+            <div class="mc-row"><span>Tip</span><span class="mc-val">Torna</span></div>
+            <div class="mc-row"><span>Mevcut IE</span><span class="mc-val">-</span></div>
+            <div class="mc-row"><span>Bakim Tipi</span><span class="mc-val">Koruyucu Bakim</span></div>
+            <div class="mc-row"><span>Baslangic</span><span class="mc-val">08:00</span></div>
+            <div class="mc-row"><span>Tah. Bitis</span><span class="mc-val">14:00</span></div>
+            <div class="mc-row"><span>Teknisyen</span><span class="mc-val">B. Sahin</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 6. PLAN - GERCEKLESEN ANALIZI ===== -->
+    <div class="screen" id="screen-analytics">
+      <div class="kpi-row" style="grid-template-columns:repeat(4,1fr)">
+        <div class="kpi-card">
+          <div class="kpi-label">Zamaninda Teslimat</div>
+          <div class="kpi-value">72%</div>
+          <div class="kpi-sub">Hedef: 90%</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Ort. Gecikme</div>
+          <div class="kpi-value" style="color:var(--accent-amber)">1,8 gun</div>
+          <div class="kpi-sub">Geciken siparis basina</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Makine Verimi</div>
+          <div class="kpi-value">81%</div>
+          <div class="kpi-sub">Bu ay OEE</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Miktar Dogrulugu</div>
+          <div class="kpi-value">94%</div>
+          <div class="kpi-sub">Plan - Gerceklesen</div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="analytics-chart-panel">
+          <h3>Plan - Gerceklesen Sure (saat)</h3>
+          <div style="margin-top:12px">
+            <div class="horizontal-bar">
+              <span class="hbar-label">CNC-01</span>
+              <div class="hbar-track">
+                <div class="hbar-fill-planned" style="width:70%"></div>
+              </div>
+              <span class="hbar-val">56s plan</span>
+            </div>
+            <div class="horizontal-bar">
+              <span class="hbar-label"></span>
+              <div class="hbar-track">
+                <div class="hbar-fill-actual" style="width:65%"></div>
+              </div>
+              <span class="hbar-val">52s fiili</span>
+            </div>
+            <div style="height:12px"></div>
+            <div class="horizontal-bar">
+              <span class="hbar-label">CNC-02</span>
+              <div class="hbar-track">
+                <div class="hbar-fill-planned" style="width:80%"></div>
+              </div>
+              <span class="hbar-val">64s plan</span>
+            </div>
+            <div class="horizontal-bar">
+              <span class="hbar-label"></span>
+              <div class="hbar-track">
+                <div class="hbar-fill-actual" style="width:85%"></div>
+              </div>
+              <span class="hbar-val">68s fiili</span>
+            </div>
+            <div style="height:12px"></div>
+            <div class="horizontal-bar">
+              <span class="hbar-label">CNC-03</span>
+              <div class="hbar-track">
+                <div class="hbar-fill-planned" style="width:75%"></div>
+              </div>
+              <span class="hbar-val">60s plan</span>
+            </div>
+            <div class="horizontal-bar">
+              <span class="hbar-label"></span>
+              <div class="hbar-track">
+                <div class="hbar-fill-actual" style="width:90%"></div>
+              </div>
+              <span class="hbar-val">72s fiili</span>
+            </div>
+            <div style="height:12px"></div>
+            <div class="horizontal-bar">
+              <span class="hbar-label">CNC-07</span>
+              <div class="hbar-track">
+                <div class="hbar-fill-planned" style="width:85%"></div>
+              </div>
+              <span class="hbar-val">68s plan</span>
+            </div>
+            <div class="horizontal-bar">
+              <span class="hbar-label"></span>
+              <div class="hbar-track">
+                <div class="hbar-fill-actual" style="width:95%"></div>
+              </div>
+              <span class="hbar-val">76s fiili</span>
+            </div>
+          </div>
+          <div class="chart-bar-legend" style="padding:16px 0 0">
+            <span class="legend-planned">Planlanan</span>
+            <span class="legend-actual">Gerceklesen</span>
+          </div>
+        </div>
+
+        <div class="analytics-chart-panel">
+          <h3>Gecikme Analizi - Temel Nedenler</h3>
+          <div style="margin-top:16px">
+            <div class="horizontal-bar">
+              <span class="hbar-label" style="width:120px">Takim Kirilmasi</span>
+              <div class="hbar-track"><div style="width:75%;height:100%;background:var(--accent-red);border-radius:3px"></div></div>
+              <span class="hbar-val">12 vaka</span>
+            </div>
+            <div class="horizontal-bar">
+              <span class="hbar-label" style="width:120px">Malzeme Bekleme</span>
+              <div class="hbar-track"><div style="width:60%;height:100%;background:var(--accent-amber);border-radius:3px"></div></div>
+              <span class="hbar-val">9 vaka</span>
+            </div>
+            <div class="horizontal-bar">
+              <span class="hbar-label" style="width:120px">Ayar Gecikmesi</span>
+              <div class="hbar-track"><div style="width:45%;height:100%;background:var(--accent-amber);border-radius:3px"></div></div>
+              <span class="hbar-val">7 vaka</span>
+            </div>
+            <div class="horizontal-bar">
+              <span class="hbar-label" style="width:120px">Operator Eksik</span>
+              <div class="hbar-track"><div style="width:30%;height:100%;background:var(--accent-blue);border-radius:3px"></div></div>
+              <span class="hbar-val">5 vaka</span>
+            </div>
+            <div class="horizontal-bar">
+              <span class="hbar-label" style="width:120px">Kalite Red</span>
+              <div class="hbar-track"><div style="width:20%;height:100%;background:var(--accent-blue);border-radius:3px"></div></div>
+              <span class="hbar-val">3 vaka</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="panel">
+          <div class="panel-header"><h3>Makine Verimi (OEE)</h3></div>
+          <table class="data-table">
+            <thead><tr><th>Makine</th><th>Kullanilabilirlik</th><th>Performans</th><th>Kalite</th><th>OEE</th><th>Trend</th></tr></thead>
+            <tbody>
+              <tr><td style="font-weight:600;color:var(--text-primary)">CNC-01</td><td>94%</td><td>88%</td><td>99%</td><td style="font-weight:700;color:var(--accent-green)">82%</td><td><span class="up">+2%</span></td></tr>
+              <tr><td style="font-weight:600;color:var(--text-primary)">CNC-02</td><td>89%</td><td>82%</td><td>98%</td><td style="font-weight:700;color:var(--accent-amber)">72%</td><td><span class="down">-3%</span></td></tr>
+              <tr><td style="font-weight:600;color:var(--text-primary)">CNC-03</td><td>86%</td><td>79%</td><td>97%</td><td style="font-weight:700;color:var(--accent-amber)">66%</td><td><span class="down">-5%</span></td></tr>
+              <tr><td style="font-weight:600;color:var(--text-primary)">CNC-05</td><td>92%</td><td>90%</td><td>99%</td><td style="font-weight:700;color:var(--accent-green)">82%</td><td><span class="up">+1%</span></td></tr>
+              <tr><td style="font-weight:600;color:var(--text-primary)">CNC-07</td><td>78%</td><td>85%</td><td>96%</td><td style="font-weight:700;color:var(--accent-red)">64%</td><td><span class="down">-8%</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header"><h3>Plan - Gerceklesen Miktar</h3></div>
+          <table class="data-table">
+            <thead><tr><th>IE No</th><th>Parca</th><th>Planlanan</th><th>Gerceklesen</th><th>Sapma</th><th>Durum</th></tr></thead>
+            <tbody>
+              <tr><td style="font-weight:600;color:var(--text-primary)">WO-1098</td><td>GBX-1155</td><td>300</td><td>298</td><td style="color:var(--accent-green)">-0,7%</td><td><span class="badge badge-green">Iyi</span></td></tr>
+              <tr><td style="font-weight:600;color:var(--text-primary)">WO-1102</td><td>CYL-3301</td><td>750</td><td>742</td><td style="color:var(--accent-green)">-1,1%</td><td><span class="badge badge-green">Iyi</span></td></tr>
+              <tr><td style="font-weight:600;color:var(--text-primary)">WO-1080</td><td>BRG-1100</td><td>500</td><td>488</td><td style="color:var(--accent-amber)">-2,4%</td><td><span class="badge badge-amber">Takipte</span></td></tr>
+              <tr><td style="font-weight:600;color:var(--text-primary)">WO-1087</td><td>BRK-4421</td><td>500</td><td>410</td><td style="color:var(--accent-red)">-18%</td><td><span class="badge badge-red">Geride</span></td></tr>
+              <tr><td style="font-weight:600;color:var(--text-primary)">WO-1092</td><td>SHF-2210</td><td>1.200</td><td>980</td><td style="color:var(--accent-red)">-18,3%</td><td><span class="badge badge-red">Geride</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<script>
+// Basit navigasyon
+const navItems = document.querySelectorAll('.nav-item[data-screen]');
+const screens = document.querySelectorAll('.screen');
+const screenTitle = document.getElementById('screen-title');
+
+const titles = {
+  dashboard: 'Yonetim Paneli',
+  planning: 'Uretim Planlama Panosu',
+  workorder: 'Is Emri Detayi',
+  capacity: 'Kapasite Planlama',
+  shopfloor: 'Uretim Sahasi Izleme',
+  analytics: 'Plan - Gerceklesen Analizi'
+};
+
+navItems.forEach(item => {
+  item.addEventListener('click', () => {
+    const target = item.dataset.screen;
+    navItems.forEach(n => n.classList.remove('active'));
+    item.classList.add('active');
+    screens.forEach(s => s.classList.remove('active'));
+    document.getElementById('screen-' + target).classList.add('active');
+    screenTitle.textContent = titles[target] || '';
+  });
+});
+
+// ===== PLANLAMA PANOSU: IS EMRI VERILERI =====
+const woData = {
+  'WO-1087': { wo:'WO-2024-1087', musteri:'Ford Otosan', parca:'BRK-4421', miktar:500, makine:'CNC-03', oncelik:'Kritik', oncelikColor:'var(--accent-red)', termin:'20 Mar 2024', planBas:'17 Mar, 06:00', planBit:'20 Mar, 14:00', fiiliBas:'18 Mar, 08:00', fiiliBit:'Devam Ediyor', fiiliBitColor:'var(--accent-red)', gecikme:'+3 gun', gecikmeNeden:'Op 20\'de takim kirilmasi', ilerleme:45, uretilen:225, durum:'Gecikti', durumClass:'badge-red',
+    ops:[{ad:'Op 10 - Kaba Tornalama',durum:'Tamam',cls:'badge-green'},{ad:'Op 20 - Hassas Freze',durum:'Calisiyor',cls:'badge-blue'},{ad:'Op 30 - Delme',durum:'Bekliyor',cls:'badge-gray'},{ad:'Op 40 - Kontrol',durum:'Bekliyor',cls:'badge-gray'}],
+    hazirlik:{hammadde:true,takim:true,program:true,resim:true}},
+  'WO-1098': { wo:'WO-2024-1098', musteri:'Hyundai Assan', parca:'GBX-1155', miktar:300, makine:'CNC-01', oncelik:'Normal', oncelikColor:'var(--text-secondary)', termin:'22 Mar 2024', planBas:'18 Mar, 06:00', planBit:'20 Mar, 18:00', fiiliBas:'18 Mar, 06:30', fiiliBit:'20 Mar, 16:45', fiiliBitColor:'var(--accent-green)', gecikme:'-', gecikmeNeden:'-', ilerleme:100, uretilen:300, durum:'Tamamlandi', durumClass:'badge-green',
+    ops:[{ad:'Op 10 - Kaba Tornalama',durum:'Tamam',cls:'badge-green'},{ad:'Op 20 - Hassas Freze',durum:'Tamam',cls:'badge-green'},{ad:'Op 30 - Kontrol',durum:'Tamam',cls:'badge-green'}],
+    hazirlik:{hammadde:true,takim:true,program:true,resim:true}},
+  'WO-1103': { wo:'WO-2024-1103', musteri:'Hyundai Assan', parca:'GBX-1155', miktar:300, makine:'CNC-01', oncelik:'Normal', oncelikColor:'var(--text-secondary)', termin:'27 Mar 2024', planBas:'22 Mar, 06:00', planBit:'24 Mar, 14:00', fiiliBas:'22 Mar, 06:00', fiiliBit:'Devam Ediyor', fiiliBitColor:'var(--accent-blue)', gecikme:'-', gecikmeNeden:'-', ilerleme:62, uretilen:185, durum:'Devam Ediyor', durumClass:'badge-blue',
+    ops:[{ad:'Op 10 - Kaba Tornalama',durum:'Tamam',cls:'badge-green'},{ad:'Op 20 - Hassas Freze',durum:'Calisiyor',cls:'badge-blue'},{ad:'Op 30 - Kontrol',durum:'Bekliyor',cls:'badge-gray'}],
+    hazirlik:{hammadde:true,takim:true,program:true,resim:true}},
+  'WO-1101': { wo:'WO-2024-1101', musteri:'TOFAS', parca:'PST-7789', miktar:2000, makine:'CNC-02', oncelik:'Normal', oncelikColor:'var(--text-secondary)', termin:'28 Mar 2024', planBas:'20 Mar, 06:00', planBit:'26 Mar, 22:00', fiiliBas:'20 Mar, 06:00', fiiliBit:'Devam Ediyor', fiiliBitColor:'var(--accent-blue)', gecikme:'-', gecikmeNeden:'-', ilerleme:71, uretilen:1420, durum:'Devam Ediyor', durumClass:'badge-blue',
+    ops:[{ad:'Op 10 - 5 Eksen Freze',durum:'Calisiyor',cls:'badge-blue'},{ad:'Op 20 - Delme',durum:'Bekliyor',cls:'badge-gray'},{ad:'Op 30 - Kontrol',durum:'Bekliyor',cls:'badge-gray'}],
+    hazirlik:{hammadde:true,takim:true,program:true,resim:true}},
+  'WO-1115': { wo:'WO-2024-1115', musteri:'Karsan', parca:'HSG-4400', miktar:200, makine:'CNC-02', oncelik:'Yuksek', oncelikColor:'var(--accent-amber)', termin:'26 Mar 2024', planBas:'24 Mar, 14:00', planBit:'25 Mar, 22:00', fiiliBas:'-', fiiliBit:'-', fiiliBitColor:'var(--text-muted)', gecikme:'Bloke', gecikmeNeden:'Hammadde depoda yok', ilerleme:0, uretilen:0, durum:'Bloke', durumClass:'badge-amber',
+    ops:[{ad:'Op 10 - 5 Eksen Freze',durum:'Bekliyor',cls:'badge-gray'},{ad:'Op 20 - Taslama',durum:'Bekliyor',cls:'badge-gray'}],
+    hazirlik:{hammadde:false,takim:true,program:true,resim:true}},
+  'WO-1105': { wo:'WO-2024-1105', musteri:'Ford Otosan', parca:'BRK-4421', miktar:500, makine:'CNC-03', oncelik:'Kritik', oncelikColor:'var(--accent-red)', termin:'26 Mar 2024', planBas:'24 Mar, 06:00', planBit:'26 Mar, 14:00', fiiliBas:'-', fiiliBit:'-', fiiliBitColor:'var(--text-muted)', gecikme:'-', gecikmeNeden:'-', ilerleme:0, uretilen:0, durum:'Planli', durumClass:'badge-blue',
+    ops:[{ad:'Op 10 - Kaba Tornalama',durum:'Bekliyor',cls:'badge-gray'},{ad:'Op 20 - Hassas Freze',durum:'Bekliyor',cls:'badge-gray'},{ad:'Op 30 - Delme',durum:'Bekliyor',cls:'badge-gray'},{ad:'Op 40 - Kontrol',durum:'Bekliyor',cls:'badge-gray'}],
+    hazirlik:{hammadde:true,takim:true,program:false,resim:true}},
+  'WO-1092': { wo:'WO-2024-1092', musteri:'Toyota Turkiye', parca:'SHF-2210', miktar:1200, makine:'CNC-07', oncelik:'Yuksek', oncelikColor:'var(--accent-amber)', termin:'21 Mar 2024', planBas:'18 Mar, 06:00', planBit:'21 Mar, 22:00', fiiliBas:'18 Mar, 08:00', fiiliBit:'Devam Ediyor', fiiliBitColor:'var(--accent-red)', gecikme:'+2 gun', gecikmeNeden:'Setup suresi beklenenden uzun', ilerleme:82, uretilen:980, durum:'Gecikti', durumClass:'badge-red',
+    ops:[{ad:'Op 10 - 5 Eksen Freze',durum:'Calisiyor',cls:'badge-blue'},{ad:'Op 20 - Taslama',durum:'Bekliyor',cls:'badge-gray'},{ad:'Op 30 - Kontrol',durum:'Bekliyor',cls:'badge-gray'}],
+    hazirlik:{hammadde:true,takim:true,program:true,resim:true}},
+  'WO-1130': { wo:'WO-2024-1130', musteri:'Mercedes Turk', parca:'VLV-9900', miktar:150, makine:'CNC-07', oncelik:'Yuksek', oncelikColor:'var(--accent-amber)', termin:'28 Mar 2024', planBas:'26 Mar, 06:00', planBit:'27 Mar, 18:00', fiiliBas:'-', fiiliBit:'-', fiiliBitColor:'var(--text-muted)', gecikme:'Bloke', gecikmeNeden:'Malzeme + takim eksik', ilerleme:0, uretilen:0, durum:'Bloke', durumClass:'badge-amber',
+    ops:[{ad:'Op 10 - 5 Eksen Freze',durum:'Bekliyor',cls:'badge-gray'},{ad:'Op 20 - Montaj',durum:'Bekliyor',cls:'badge-gray'}],
+    hazirlik:{hammadde:false,takim:false,program:true,resim:true}},
+  'WO-1080': { wo:'WO-2024-1080', musteri:'Toyota Turkiye', parca:'BRG-1100', miktar:500, makine:'CNC-08', oncelik:'Normal', oncelikColor:'var(--text-secondary)', termin:'20 Mar 2024', planBas:'17 Mar, 06:00', planBit:'19 Mar, 22:00', fiiliBas:'17 Mar, 06:00', fiiliBit:'19 Mar, 20:30', fiiliBitColor:'var(--accent-green)', gecikme:'-', gecikmeNeden:'-', ilerleme:100, uretilen:500, durum:'Tamamlandi', durumClass:'badge-green',
+    ops:[{ad:'Op 10 - Tornalama',durum:'Tamam',cls:'badge-green'},{ad:'Op 20 - Kontrol',durum:'Tamam',cls:'badge-green'}],
+    hazirlik:{hammadde:true,takim:true,program:true,resim:true}},
+  'WO-1095': { wo:'WO-2024-1095', musteri:'Hyundai Assan', parca:'SHF-2211', miktar:120, makine:'CNC-06', oncelik:'Normal', oncelikColor:'var(--text-secondary)', termin:'26 Mar 2024', planBas:'22 Mar, 06:00', planBit:'25 Mar, 14:00', fiiliBas:'22 Mar, 06:00', fiiliBit:'Devam Ediyor', fiiliBitColor:'var(--accent-blue)', gecikme:'-', gecikmeNeden:'-', ilerleme:73, uretilen:88, durum:'Devam Ediyor', durumClass:'badge-blue',
+    ops:[{ad:'Op 10 - Taslama',durum:'Calisiyor',cls:'badge-blue'},{ad:'Op 20 - Kontrol',durum:'Bekliyor',cls:'badge-gray'}],
+    hazirlik:{hammadde:true,takim:true,program:true,resim:true}},
+  'WO-1100': { wo:'WO-2024-1100', musteri:'Karsan', parca:'AXL-8810', miktar:400, makine:'CNC-04', oncelik:'Normal', oncelikColor:'var(--text-secondary)', termin:'29 Mar 2024', planBas:'24 Mar, 06:00', planBit:'26 Mar, 14:00', fiiliBas:'-', fiiliBit:'-', fiiliBitColor:'var(--text-muted)', gecikme:'-', gecikmeNeden:'-', ilerleme:0, uretilen:0, durum:'Planli', durumClass:'badge-blue',
+    ops:[{ad:'Op 10 - Dikey Freze',durum:'Bekliyor',cls:'badge-gray'},{ad:'Op 20 - Delme',durum:'Bekliyor',cls:'badge-gray'},{ad:'Op 30 - Kontrol',durum:'Bekliyor',cls:'badge-gray'}],
+    hazirlik:{hammadde:true,takim:true,program:true,resim:true}},
+  'WO-1102': { wo:'WO-2024-1102', musteri:'Mercedes Turk', parca:'CYL-3301', miktar:750, makine:'CNC-05', oncelik:'Yuksek', oncelikColor:'var(--accent-amber)', termin:'24 Mar 2024', planBas:'20 Mar, 06:00', planBit:'23 Mar, 22:00', fiiliBas:'20 Mar, 06:00', fiiliBit:'23 Mar, 20:00', fiiliBitColor:'var(--accent-green)', gecikme:'-', gecikmeNeden:'-', ilerleme:100, uretilen:742, durum:'Tamamlandi', durumClass:'badge-green',
+    ops:[{ad:'Op 10 - Tornalama',durum:'Tamam',cls:'badge-green'},{ad:'Op 20 - Hassas Freze',durum:'Tamam',cls:'badge-green'},{ad:'Op 30 - Kontrol',durum:'Tamam',cls:'badge-green'}],
+    hazirlik:{hammadde:true,takim:true,program:true,resim:true}},
+  'WO-1104': { wo:'WO-2024-1104', musteri:'Toyota Turkiye', parca:'SHF-2210', miktar:1200, makine:'CNC-07', oncelik:'Yuksek', oncelikColor:'var(--accent-amber)', termin:'25 Mar 2024', planBas:'24 Mar, 06:00', planBit:'25 Mar, 22:00', fiiliBas:'24 Mar, 08:00', fiiliBit:'Devam Ediyor', fiiliBitColor:'var(--accent-blue)', gecikme:'-', gecikmeNeden:'-', ilerleme:10, uretilen:120, durum:'Devam Ediyor', durumClass:'badge-blue',
+    ops:[{ad:'Op 10 - 5 Eksen Freze',durum:'Calisiyor',cls:'badge-blue'},{ad:'Op 20 - Taslama',durum:'Bekliyor',cls:'badge-gray'}],
+    hazirlik:{hammadde:true,takim:true,program:true,resim:true}},
+  'WO-1108': { wo:'WO-2024-1108', musteri:'Ford Otosan', parca:'RNG-5500', miktar:600, makine:'CNC-04', oncelik:'Normal', oncelikColor:'var(--text-secondary)', termin:'28 Mar 2024', planBas:'25 Mar, 06:00', planBit:'27 Mar, 14:00', fiiliBas:'-', fiiliBit:'-', fiiliBitColor:'var(--text-muted)', gecikme:'-', gecikmeNeden:'-', ilerleme:0, uretilen:0, durum:'Planli', durumClass:'badge-blue',
+    ops:[{ad:'Op 10 - Dikey Freze',durum:'Bekliyor',cls:'badge-gray'},{ad:'Op 20 - Delme',durum:'Bekliyor',cls:'badge-gray'}],
+    hazirlik:{hammadde:true,takim:true,program:true,resim:true}},
+  'WO-1109': { wo:'WO-2024-1109', musteri:'Toyota Turkiye', parca:'BRG-1101', miktar:500, makine:'CNC-08', oncelik:'Normal', oncelikColor:'var(--text-secondary)', termin:'27 Mar 2024', planBas:'22 Mar, 06:00', planBit:'25 Mar, 14:00', fiiliBas:'22 Mar, 06:00', fiiliBit:'Devam Ediyor', fiiliBitColor:'var(--accent-blue)', gecikme:'-', gecikmeNeden:'-', ilerleme:40, uretilen:200, durum:'Devam Ediyor', durumClass:'badge-blue',
+    ops:[{ad:'Op 10 - Tornalama',durum:'Calisiyor',cls:'badge-blue'},{ad:'Op 20 - Kontrol',durum:'Bekliyor',cls:'badge-gray'}],
+    hazirlik:{hammadde:true,takim:true,program:true,resim:true}},
+  'WO-1110': { wo:'WO-2024-1110', musteri:'TOFAS', parca:'FLG-2200', miktar:350, makine:'CNC-01', oncelik:'Normal', oncelikColor:'var(--text-secondary)', termin:'28 Mar 2024', planBas:'25 Mar, 06:00', planBit:'27 Mar, 14:00', fiiliBas:'-', fiiliBit:'-', fiiliBitColor:'var(--text-muted)', gecikme:'-', gecikmeNeden:'-', ilerleme:0, uretilen:0, durum:'Planli', durumClass:'badge-blue',
+    ops:[{ad:'Op 10 - Tornalama',durum:'Bekliyor',cls:'badge-gray'},{ad:'Op 20 - Freze',durum:'Bekliyor',cls:'badge-gray'}],
+    hazirlik:{hammadde:true,takim:true,program:true,resim:true}},
+  'WO-1112': { wo:'WO-2024-1112', musteri:'Mercedes Turk', parca:'CYL-3302', miktar:750, makine:'CNC-05', oncelik:'Normal', oncelikColor:'var(--text-secondary)', termin:'27 Mar 2024', planBas:'24 Mar, 06:00', planBit:'26 Mar, 14:00', fiiliBas:'24 Mar, 06:00', fiiliBit:'Devam Ediyor', fiiliBitColor:'var(--accent-blue)', gecikme:'-', gecikmeNeden:'-', ilerleme:35, uretilen:260, durum:'Devam Ediyor', durumClass:'badge-blue',
+    ops:[{ad:'Op 10 - Tornalama',durum:'Calisiyor',cls:'badge-blue'},{ad:'Op 20 - Hassas Freze',durum:'Bekliyor',cls:'badge-gray'},{ad:'Op 30 - Kontrol',durum:'Bekliyor',cls:'badge-gray'}],
+    hazirlik:{hammadde:true,takim:true,program:true,resim:true}},
+  'WO-1118': { wo:'WO-2024-1118', musteri:'Hyundai Assan', parca:'PIN-7700', miktar:800, makine:'CNC-05', oncelik:'Normal', oncelikColor:'var(--text-secondary)', termin:'25 Mar 2024', planBas:'24 Mar, 14:00', planBit:'26 Mar, 06:00', fiiliBas:'-', fiiliBit:'-', fiiliBitColor:'var(--text-muted)', gecikme:'+1 gun', gecikmeNeden:'Onceki is gecikmesi nedeniyle kayma', ilerleme:0, uretilen:0, durum:'Gecikti', durumClass:'badge-red',
+    ops:[{ad:'Op 10 - Tornalama',durum:'Bekliyor',cls:'badge-gray'},{ad:'Op 20 - Kontrol',durum:'Bekliyor',cls:'badge-gray'}],
+    hazirlik:{hammadde:true,takim:true,program:true,resim:true}},
+  'WO-1120': { wo:'WO-2024-1120', musteri:'Karsan', parca:'CAP-6600', miktar:250, makine:'CNC-04', oncelik:'Normal', oncelikColor:'var(--text-secondary)', termin:'29 Mar 2024', planBas:'27 Mar, 06:00', planBit:'28 Mar, 14:00', fiiliBas:'-', fiiliBit:'-', fiiliBitColor:'var(--text-muted)', gecikme:'-', gecikmeNeden:'-', ilerleme:0, uretilen:0, durum:'Planli', durumClass:'badge-blue',
+    ops:[{ad:'Op 10 - Dikey Freze',durum:'Bekliyor',cls:'badge-gray'},{ad:'Op 20 - Kontrol',durum:'Bekliyor',cls:'badge-gray'}],
+    hazirlik:{hammadde:true,takim:false,program:true,resim:true}},
+  'WO-1125': { wo:'WO-2024-1125', musteri:'TOFAS', parca:'GER-8800', miktar:180, makine:'CNC-06', oncelik:'Normal', oncelikColor:'var(--text-secondary)', termin:'28 Mar 2024', planBas:'26 Mar, 06:00', planBit:'27 Mar, 18:00', fiiliBas:'-', fiiliBit:'-', fiiliBitColor:'var(--text-muted)', gecikme:'-', gecikmeNeden:'-', ilerleme:0, uretilen:0, durum:'Planli', durumClass:'badge-blue',
+    ops:[{ad:'Op 10 - Taslama',durum:'Bekliyor',cls:'badge-gray'},{ad:'Op 20 - Kontrol',durum:'Bekliyor',cls:'badge-gray'}],
+    hazirlik:{hammadde:true,takim:true,program:true,resim:true}},
+};
+
+// Blok secimi ve detay paneli guncelleme
+function selectBlock(el) {
+  document.querySelectorAll('.planning-block').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+  const woKey = el.dataset.wo;
+  const d = woData[woKey];
+  if (!d) return;
+
+  const progressColor = d.durumClass === 'badge-red' ? 'var(--accent-red)' : d.durumClass === 'badge-green' ? 'var(--accent-green)' : 'var(--accent-blue)';
+  const hz = (v) => v ? '<span style="color:var(--accent-green)">Hazir</span>' : '<span style="color:var(--accent-red)">Eksik</span>';
+
+  let opsHtml = '';
+  d.ops.forEach(op => {
+    opsHtml += '<div class="detail-row"><span class="label">' + op.ad + '</span><span class="value"><span class="badge ' + op.cls + '">' + op.durum + '</span></span></div>';
+  });
+
+  document.getElementById('detail-content').innerHTML =
+    '<div style="margin-bottom:16px">' +
+      '<span class="badge ' + d.durumClass + '" style="margin-bottom:8px;display:inline-block">' + d.durum + '</span>' +
+      '<h3 style="font-size:16px;font-weight:700">' + d.wo + '</h3>' +
+      '<p style="font-size:12px;color:var(--text-muted);margin-top:4px">' + d.musteri + ' - ' + d.parca + '</p>' +
+    '</div>' +
+    '<div class="detail-row"><span class="label">Musteri</span><span class="value">' + d.musteri + '</span></div>' +
+    '<div class="detail-row"><span class="label">Parca No</span><span class="value">' + d.parca + '</span></div>' +
+    '<div class="detail-row"><span class="label">Miktar</span><span class="value">' + d.miktar + ' adet</span></div>' +
+    '<div class="detail-row"><span class="label">Makine</span><span class="value">' + d.makine + '</span></div>' +
+    '<div class="detail-row"><span class="label">Oncelik</span><span class="value" style="color:' + d.oncelikColor + '">' + d.oncelik + '</span></div>' +
+    '<div class="detail-row"><span class="label">Termin</span><span class="value">' + d.termin + '</span></div>' +
+    '<div class="detail-row"><span class="label">Plan. Baslangic</span><span class="value">' + d.planBas + '</span></div>' +
+    '<div class="detail-row"><span class="label">Plan. Bitis</span><span class="value">' + d.planBit + '</span></div>' +
+    '<div class="detail-row"><span class="label">Fiili Baslangic</span><span class="value">' + d.fiiliBas + '</span></div>' +
+    '<div class="detail-row"><span class="label">Fiili Bitis</span><span class="value" style="color:' + d.fiiliBitColor + '">' + d.fiiliBit + '</span></div>' +
+    '<div class="detail-row"><span class="label">Gecikme</span><span class="value" style="color:var(--accent-red)">' + d.gecikme + '</span></div>' +
+    '<div class="detail-row"><span class="label">Gecikme Nedeni</span><span class="value">' + d.gecikmeNeden + '</span></div>' +
+    '<div style="margin-top:16px">' +
+      '<div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px">' +
+        '<span style="color:var(--text-muted)">Ilerleme</span><span style="font-weight:700">' + d.ilerleme + '%</span>' +
+      '</div>' +
+      '<div style="height:6px;background:var(--bg-dark);border-radius:3px;overflow:hidden">' +
+        '<div style="width:' + d.ilerleme + '%;height:100%;background:' + progressColor + ';border-radius:3px"></div>' +
+      '</div>' +
+      '<div style="font-size:10px;color:var(--text-muted);margin-top:4px">' + d.uretilen + ' / ' + d.miktar + ' adet</div>' +
+    '</div>' +
+    '<div style="margin-top:20px">' +
+      '<h4 style="font-size:12px;font-weight:600;color:var(--text-muted);margin-bottom:10px;text-transform:uppercase;letter-spacing:1px">Operasyonlar</h4>' +
+      opsHtml +
+    '</div>' +
+    '<div style="margin-top:16px">' +
+      '<h4 style="font-size:12px;font-weight:600;color:var(--text-muted);margin-bottom:10px;text-transform:uppercase;letter-spacing:1px">Hazirlik Durumu</h4>' +
+      '<div class="detail-row"><span class="label">Hammadde</span><span class="value">' + hz(d.hazirlik.hammadde) + '</span></div>' +
+      '<div class="detail-row"><span class="label">Takim / Aparat</span><span class="value">' + hz(d.hazirlik.takim) + '</span></div>' +
+      '<div class="detail-row"><span class="label">CNC Program</span><span class="value">' + hz(d.hazirlik.program) + '</span></div>' +
+      '<div class="detail-row"><span class="label">Teknik Resim</span><span class="value">' + hz(d.hazirlik.resim) + '</span></div>' +
+    '</div>';
+}
+
+// Filtre butonlari
+document.querySelectorAll('.plan-filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.plan-filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const filter = btn.dataset.filter;
+    document.querySelectorAll('.planning-block').forEach(block => {
+      if (filter === 'all') { block.style.opacity = '1'; return; }
+      const match = block.classList.contains('status-' + filter);
+      block.style.opacity = match ? '1' : '0.2';
+    });
+  });
+});
+
+// "Simdi" cizgisi - tum lane'lere ekle
+function updateNowLines() {
+  document.querySelectorAll('.now-line').forEach(el => el.remove());
+  const hour = new Date().getHours();
+  const min = new Date().getMinutes();
+  const startH = 6, endH = 24;
+  const pct = Math.max(0, Math.min(100, ((hour - startH) + min/60) / (endH - startH) * 100));
+  document.querySelectorAll('.planning-lane-body').forEach(body => {
+    const line = document.createElement('div');
+    line.className = 'now-line';
+    line.style.left = pct + '%';
+    body.appendChild(line);
+  });
+}
+updateNowLines();
+</script>
+</body>
+</html>
