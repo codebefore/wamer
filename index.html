@@ -809,7 +809,11 @@ body {
       Kontrol Paneli
     </div>
 
-    <div class="nav-section-label">Planlama</div>
+    <div class="nav-section-label">Siparis & Planlama</div>
+    <div class="nav-item" data-screen="orders">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+      Siparisler
+    </div>
     <div class="nav-item" data-screen="planning">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
       Uretim Panosu
@@ -986,6 +990,281 @@ body {
             <tr><td style="color:var(--text-primary);font-weight:600">WO-2024-1102</td><td>Mercedes Turk</td><td>CYL-3301</td><td>750</td><td>CNC-05</td><td>24 Mar</td><td><span class="badge badge-amber">Yuksek</span></td><td><span class="badge badge-green">Tamamlandi</span></td></tr>
             <tr><td style="color:var(--text-primary);font-weight:600">WO-2024-1101</td><td>TOFAS</td><td>PST-7789</td><td>2.000</td><td>CNC-02</td><td>28 Mar</td><td><span class="badge badge-gray">Normal</span></td><td><span class="badge badge-blue">Devam Ediyor</span></td></tr>
             <tr><td style="color:var(--text-primary);font-weight:600">WO-2024-1100</td><td>Karsan</td><td>AXL-8810</td><td>400</td><td>CNC-04</td><td>29 Mar</td><td><span class="badge badge-gray">Normal</span></td><td><span class="badge badge-amber">Sirada</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ===== SIPARIS YONETIMI ===== -->
+    <div class="screen" id="screen-orders">
+      <!-- KPI -->
+      <div class="kpi-row" style="grid-template-columns:repeat(5,1fr)">
+        <div class="kpi-card">
+          <div class="kpi-label">Toplam Siparis</div>
+          <div class="kpi-value">86</div>
+          <div class="kpi-sub">Bu ay</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Acik Siparisler</div>
+          <div class="kpi-value" style="color:var(--accent-blue)">47</div>
+          <div class="kpi-sub">Planlanmasi gereken</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Uretimde</div>
+          <div class="kpi-value" style="color:var(--accent-green)">28</div>
+          <div class="kpi-sub">Is emri olusturuldu</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Geciken Termin</div>
+          <div class="kpi-value" style="color:var(--accent-red)">8</div>
+          <div class="kpi-sub">Termin gecmis / risk</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Tamamlanan</div>
+          <div class="kpi-value">11</div>
+          <div class="kpi-sub">Bu ay sevk edilen</div>
+        </div>
+      </div>
+
+      <!-- Filtre ve Aksiyonlar -->
+      <div class="panel">
+        <div class="panel-header">
+          <div style="display:flex;align-items:center;gap:8px">
+            <h3>Siparis Listesi</h3>
+            <div style="display:flex;gap:4px;margin-left:12px">
+              <button class="plan-filter-btn active" onclick="filterOrders(this,'all')">Tumu <span class="filter-count">86</span></button>
+              <button class="plan-filter-btn" onclick="filterOrders(this,'acik')">Acik <span class="filter-count">47</span></button>
+              <button class="plan-filter-btn" onclick="filterOrders(this,'uretimde')">Uretimde <span class="filter-count">28</span></button>
+              <button class="plan-filter-btn" onclick="filterOrders(this,'geciken')">Geciken <span class="filter-count">8</span></button>
+              <button class="plan-filter-btn" onclick="filterOrders(this,'tamamlandi')">Tamamlandi <span class="filter-count">11</span></button>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <input type="text" placeholder="Siparis, musteri veya parca ara..." oninput="searchOrders(this.value)" style="background:var(--bg-input);border:1px solid var(--border);color:var(--text-primary);padding:6px 12px;border-radius:var(--radius-sm);font-size:12px;outline:none;width:220px">
+            <button class="btn btn-ghost" style="font-size:11px">Excel Yukle</button>
+            <button class="btn btn-primary" style="font-size:11px">+ Yeni Siparis</button>
+          </div>
+        </div>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Siparis No</th>
+              <th>Musteri</th>
+              <th>Parca No</th>
+              <th>Parca Adi</th>
+              <th>Miktar</th>
+              <th>Termin</th>
+              <th>Oncelik</th>
+              <th>Durum</th>
+              <th>IE Durumu</th>
+              <th>Ilerleme</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="order-row" data-status="geciken">
+              <td style="color:var(--text-primary);font-weight:600">SIP-2026-0412</td>
+              <td>Ford Otosan</td>
+              <td>BRK-4421</td>
+              <td>Fren Kaliper Govdesi</td>
+              <td>500</td>
+              <td style="color:var(--accent-red)">20 Mar</td>
+              <td><span class="badge badge-red">Kritik</span></td>
+              <td><span class="badge badge-red">Gecikti</span></td>
+              <td><span style="color:var(--text-primary)">WO-1087</span></td>
+              <td>
+                <div style="display:flex;align-items:center;gap:8px">
+                  <div style="flex:1;height:6px;background:var(--bg-dark);border-radius:3px;overflow:hidden"><div style="width:45%;height:100%;background:var(--accent-red);border-radius:3px"></div></div>
+                  <span style="font-size:11px;color:var(--text-muted);width:30px">45%</span>
+                </div>
+              </td>
+            </tr>
+            <tr class="order-row" data-status="uretimde">
+              <td style="color:var(--text-primary);font-weight:600">SIP-2026-0415</td>
+              <td>Ford Otosan</td>
+              <td>BRK-4421</td>
+              <td>Fren Kaliper Govdesi</td>
+              <td>500</td>
+              <td>26 Mar</td>
+              <td><span class="badge badge-red">Kritik</span></td>
+              <td><span class="badge badge-blue">Uretimde</span></td>
+              <td><span style="color:var(--text-primary)">WO-1105</span></td>
+              <td>
+                <div style="display:flex;align-items:center;gap:8px">
+                  <div style="flex:1;height:6px;background:var(--bg-dark);border-radius:3px;overflow:hidden"><div style="width:62%;height:100%;background:var(--accent-blue);border-radius:3px"></div></div>
+                  <span style="font-size:11px;color:var(--text-muted);width:30px">62%</span>
+                </div>
+              </td>
+            </tr>
+            <tr class="order-row" data-status="geciken">
+              <td style="color:var(--text-primary);font-weight:600">SIP-2026-0389</td>
+              <td>Toyota Turkiye</td>
+              <td>SHF-2210</td>
+              <td>Sanziman Mili</td>
+              <td>1.200</td>
+              <td style="color:var(--accent-red)">21 Mar</td>
+              <td><span class="badge badge-amber">Yuksek</span></td>
+              <td><span class="badge badge-red">Gecikti</span></td>
+              <td><span style="color:var(--text-primary)">WO-1092</span></td>
+              <td>
+                <div style="display:flex;align-items:center;gap:8px">
+                  <div style="flex:1;height:6px;background:var(--bg-dark);border-radius:3px;overflow:hidden"><div style="width:82%;height:100%;background:var(--accent-red);border-radius:3px"></div></div>
+                  <span style="font-size:11px;color:var(--text-muted);width:30px">82%</span>
+                </div>
+              </td>
+            </tr>
+            <tr class="order-row" data-status="uretimde">
+              <td style="color:var(--text-primary);font-weight:600">SIP-2026-0401</td>
+              <td>TOFAS</td>
+              <td>PST-7789</td>
+              <td>Piston Kolu</td>
+              <td>2.000</td>
+              <td>28 Mar</td>
+              <td><span class="badge badge-gray">Normal</span></td>
+              <td><span class="badge badge-blue">Uretimde</span></td>
+              <td><span style="color:var(--text-primary)">WO-1101</span></td>
+              <td>
+                <div style="display:flex;align-items:center;gap:8px">
+                  <div style="flex:1;height:6px;background:var(--bg-dark);border-radius:3px;overflow:hidden"><div style="width:71%;height:100%;background:var(--accent-blue);border-radius:3px"></div></div>
+                  <span style="font-size:11px;color:var(--text-muted);width:30px">71%</span>
+                </div>
+              </td>
+            </tr>
+            <tr class="order-row" data-status="uretimde">
+              <td style="color:var(--text-primary);font-weight:600">SIP-2026-0398</td>
+              <td>Hyundai Assan</td>
+              <td>GBX-1155</td>
+              <td>Vites Kutusu Kapagi</td>
+              <td>300</td>
+              <td>27 Mar</td>
+              <td><span class="badge badge-gray">Normal</span></td>
+              <td><span class="badge badge-blue">Uretimde</span></td>
+              <td><span style="color:var(--text-primary)">WO-1103</span></td>
+              <td>
+                <div style="display:flex;align-items:center;gap:8px">
+                  <div style="flex:1;height:6px;background:var(--bg-dark);border-radius:3px;overflow:hidden"><div style="width:62%;height:100%;background:var(--accent-blue);border-radius:3px"></div></div>
+                  <span style="font-size:11px;color:var(--text-muted);width:30px">62%</span>
+                </div>
+              </td>
+            </tr>
+            <tr class="order-row" data-status="tamamlandi">
+              <td style="color:var(--text-primary);font-weight:600">SIP-2026-0375</td>
+              <td>Mercedes Turk</td>
+              <td>CYL-3301</td>
+              <td>Silindir Basligi</td>
+              <td>750</td>
+              <td>24 Mar</td>
+              <td><span class="badge badge-amber">Yuksek</span></td>
+              <td><span class="badge badge-green">Tamamlandi</span></td>
+              <td><span style="color:var(--text-primary)">WO-1102</span></td>
+              <td>
+                <div style="display:flex;align-items:center;gap:8px">
+                  <div style="flex:1;height:6px;background:var(--bg-dark);border-radius:3px;overflow:hidden"><div style="width:100%;height:100%;background:var(--accent-green);border-radius:3px"></div></div>
+                  <span style="font-size:11px;color:var(--text-muted);width:30px">100%</span>
+                </div>
+              </td>
+            </tr>
+            <tr class="order-row" data-status="acik">
+              <td style="color:var(--text-primary);font-weight:600">SIP-2026-0420</td>
+              <td>Karsan</td>
+              <td>AXL-8810</td>
+              <td>Arka Aks Mili</td>
+              <td>400</td>
+              <td>29 Mar</td>
+              <td><span class="badge badge-gray">Normal</span></td>
+              <td><span class="badge badge-amber">Acik</span></td>
+              <td><span style="color:var(--text-muted)">-</span></td>
+              <td>
+                <div style="display:flex;align-items:center;gap:8px">
+                  <div style="flex:1;height:6px;background:var(--bg-dark);border-radius:3px;overflow:hidden"><div style="width:0%;height:100%;background:var(--accent-blue);border-radius:3px"></div></div>
+                  <span style="font-size:11px;color:var(--text-muted);width:30px">0%</span>
+                </div>
+              </td>
+            </tr>
+            <tr class="order-row" data-status="acik">
+              <td style="color:var(--text-primary);font-weight:600">SIP-2026-0422</td>
+              <td>Karsan</td>
+              <td>CAP-6600</td>
+              <td>Kaplin Kapagi</td>
+              <td>250</td>
+              <td>29 Mar</td>
+              <td><span class="badge badge-gray">Normal</span></td>
+              <td><span class="badge badge-amber">Acik</span></td>
+              <td><span style="color:var(--text-muted)">-</span></td>
+              <td>
+                <div style="display:flex;align-items:center;gap:8px">
+                  <div style="flex:1;height:6px;background:var(--bg-dark);border-radius:3px;overflow:hidden"><div style="width:0%;height:100%;background:var(--accent-blue);border-radius:3px"></div></div>
+                  <span style="font-size:11px;color:var(--text-muted);width:30px">0%</span>
+                </div>
+              </td>
+            </tr>
+            <tr class="order-row" data-status="geciken">
+              <td style="color:var(--text-primary);font-weight:600">SIP-2026-0380</td>
+              <td>Hyundai Assan</td>
+              <td>GBX-1155</td>
+              <td>Vites Kutusu Kapagi</td>
+              <td>300</td>
+              <td style="color:var(--accent-red)">19 Mar</td>
+              <td><span class="badge badge-gray">Normal</span></td>
+              <td><span class="badge badge-amber">Bloke</span></td>
+              <td><span style="color:var(--text-primary)">WO-1078</span></td>
+              <td>
+                <div style="display:flex;align-items:center;gap:8px">
+                  <div style="flex:1;height:6px;background:var(--bg-dark);border-radius:3px;overflow:hidden"><div style="width:30%;height:100%;background:var(--accent-amber);border-radius:3px"></div></div>
+                  <span style="font-size:11px;color:var(--text-muted);width:30px">30%</span>
+                </div>
+              </td>
+            </tr>
+            <tr class="order-row" data-status="acik">
+              <td style="color:var(--text-primary);font-weight:600">SIP-2026-0425</td>
+              <td>Mercedes Turk</td>
+              <td>VLV-9900</td>
+              <td>Valf Govdesi</td>
+              <td>150</td>
+              <td>28 Mar</td>
+              <td><span class="badge badge-amber">Yuksek</span></td>
+              <td><span class="badge badge-amber">Acik</span></td>
+              <td><span style="color:var(--text-muted)">-</span></td>
+              <td>
+                <div style="display:flex;align-items:center;gap:8px">
+                  <div style="flex:1;height:6px;background:var(--bg-dark);border-radius:3px;overflow:hidden"><div style="width:0%;height:100%;background:var(--accent-blue);border-radius:3px"></div></div>
+                  <span style="font-size:11px;color:var(--text-muted);width:30px">0%</span>
+                </div>
+              </td>
+            </tr>
+            <tr class="order-row" data-status="uretimde">
+              <td style="color:var(--text-primary);font-weight:600">SIP-2026-0395</td>
+              <td>Mercedes Turk</td>
+              <td>CYL-3302</td>
+              <td>Silindir Basligi V2</td>
+              <td>750</td>
+              <td>27 Mar</td>
+              <td><span class="badge badge-gray">Normal</span></td>
+              <td><span class="badge badge-blue">Uretimde</span></td>
+              <td><span style="color:var(--text-primary)">WO-1112</span></td>
+              <td>
+                <div style="display:flex;align-items:center;gap:8px">
+                  <div style="flex:1;height:6px;background:var(--bg-dark);border-radius:3px;overflow:hidden"><div style="width:35%;height:100%;background:var(--accent-blue);border-radius:3px"></div></div>
+                  <span style="font-size:11px;color:var(--text-muted);width:30px">35%</span>
+                </div>
+              </td>
+            </tr>
+            <tr class="order-row" data-status="tamamlandi">
+              <td style="color:var(--text-primary);font-weight:600">SIP-2026-0362</td>
+              <td>Toyota Turkiye</td>
+              <td>BRG-1100</td>
+              <td>Rulman Yuvasi</td>
+              <td>500</td>
+              <td>20 Mar</td>
+              <td><span class="badge badge-gray">Normal</span></td>
+              <td><span class="badge badge-green">Tamamlandi</span></td>
+              <td><span style="color:var(--text-primary)">WO-1080</span></td>
+              <td>
+                <div style="display:flex;align-items:center;gap:8px">
+                  <div style="flex:1;height:6px;background:var(--bg-dark);border-radius:3px;overflow:hidden"><div style="width:100%;height:100%;background:var(--accent-green);border-radius:3px"></div></div>
+                  <span style="font-size:11px;color:var(--text-muted);width:30px">100%</span>
+                </div>
+              </td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -1765,6 +2044,7 @@ const screenTitle = document.getElementById('screen-title');
 
 const titles = {
   dashboard: 'Yonetim Paneli',
+  orders: 'Siparis Yonetimi',
   planning: 'Uretim Planlama Panosu',
   workorder: 'Is Emri Detayi',
   capacity: 'Kapasite Planlama',
@@ -1932,6 +2212,23 @@ function updateNowLines() {
   });
 }
 updateNowLines();
+
+// Siparis tablosu filtreleme
+function filterOrders(btn, status) {
+  btn.parentElement.querySelectorAll('.plan-filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.order-row').forEach(row => {
+    row.style.display = (status === 'all' || row.dataset.status === status) ? '' : 'none';
+  });
+}
+
+// Siparis arama
+function searchOrders(q) {
+  q = q.toLowerCase();
+  document.querySelectorAll('.order-row').forEach(row => {
+    row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
+  });
+}
 </script>
 </body>
 </html>
